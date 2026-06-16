@@ -436,7 +436,14 @@ textarea{min-height:80px;resize:vertical}
       <div class="fg"><label class="fl">Categoría *</label>
         <select id="gas-cat"><option>Membresía/Suscripción</option><option>Cloud</option><option>Celular</option><option>Transporte</option><option>Parqueadero</option><option>Alimentación</option><option>Otro</option></select>
       </div>
-      <div class="fg"><label class="fl">Tipo</label><select id="gas-tipo"><option value="Fijo">Fijo</option><option value="Variable">Variable</option></select></div>
+      <div class="fg"><label class="fl">Periodicidad</label>
+        <select id="gas-tipo">
+          <option value="Fijo Mensual">Fijo Mensual</option>
+          <option value="Fijo Anual">Fijo Anual</option>
+          <option value="Fijo Quincenal">Fijo Quincenal</option>
+          <option value="Variable">Variable (eventual)</option>
+        </select>
+      </div>
     </div>
     <div class="fg"><label class="fl">Descripción *</label><input id="gas-desc" placeholder="Canva anual, Cloud AWS..."></div>
     <div class="fr">
@@ -1217,8 +1224,8 @@ function renderGastos(){
   sel.innerHTML='<option value="">Todos los meses</option>'+meses.map(function(m){return '<option'+(m===cur?' selected':'')+'>'+m+'</option>';}).join('');
   var list=D.gastos.filter(function(g){return!fmes||g.mes===fmes;});
   document.getElementById('gas-tot').textContent=fmt(D.gastos.reduce(function(s,g){return s+g.valor;},0));
-  document.getElementById('gas-fij').textContent=fmt(D.gastos.filter(function(g){return g.tipo==='Fijo';}).reduce(function(s,g){return s+g.valor;},0));
-  document.getElementById('gas-var').textContent=fmt(D.gastos.filter(function(g){return g.tipo==='Variable';}).reduce(function(s,g){return s+g.valor;},0));
+  document.getElementById('gas-fij').textContent=fmt(D.gastos.filter(function(g){return g.tipo&&g.tipo.includes('Fijo');}).reduce(function(s,g){return s+g.valor;},0));
+  document.getElementById('gas-var').textContent=fmt(D.gastos.filter(function(g){return !g.tipo||g.tipo==='Variable';}).reduce(function(s,g){return s+g.valor;},0));
   var body=document.getElementById('gas-body');
   if(!list.length){body.innerHTML='<div style="color:var(--ct);padding:2rem;text-align:center">No hay gastos</div>';return;}
   var cats={};list.forEach(function(g){if(!cats[g.categoria])cats[g.categoria]=[];cats[g.categoria].push(g);});
@@ -1237,7 +1244,8 @@ function eliminarGasto(id){if(!confirm('¿Eliminar?'))return;D.gastos=D.gastos.f
 
 // ── TALENTOS ────────────────────────────────────
 function copiarLinkTalento(){
-  navigator.clipboard.writeText('https://rumont-360.netlify.app').then(function(){toast('Link copiado ✓');}).catch(function(){toast('Link: rumont-360.netlify.app');});
+  var link='https://rumontco-a11y.github.io/rumont-360/RUMONT-Talentos-Publico.html';
+  navigator.clipboard.writeText(link).then(function(){toast('¡Link copiado! Compártelo con los empleados ✓');}).catch(function(){toast('Link: '+link);});
 }
 function abrirTalento(id){
   var t=id?D.talentos.find(function(x){return x.id===id;}):null;

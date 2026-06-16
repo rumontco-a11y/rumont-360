@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RUMONT · Únete a nuestra Red de Talentos</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Jost',sans-serif;background:#f4f1e8;min-height:100vh;padding:20px}
+.container{max-width:600px;margin:auto}
+.header{text-align:center;padding:32px 20px 24px;background:#1a1f14;border-radius:14px;margin-bottom:24px;color:#fff}
+.header h1{font-size:1.8rem;letter-spacing:6px;font-weight:300;margin-bottom:4px}
+.header p{font-size:.75rem;letter-spacing:3px;color:#8a9e60;margin-bottom:16px}
+.header .sub{font-size:.9rem;color:#ccc;font-weight:300}
+.card{background:#fff;border-radius:14px;padding:28px;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.fg{margin-bottom:16px}
+.fl{display:block;font-size:.78rem;color:#888;margin-bottom:5px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+input,select,textarea{width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:8px;font-size:.9rem;font-family:inherit;background:#fff;color:#222}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#5a6940;box-shadow:0 0 0 3px rgba(90,105,64,.1)}
+textarea{min-height:80px;resize:vertical}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.btn{width:100%;padding:14px;background:#5a6940;color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer;letter-spacing:1px;margin-top:8px;transition:.2s}
+.btn:hover{background:#4a5730}
+.btn:disabled{background:#aaa;cursor:not-allowed}
+.success{display:none;text-align:center;padding:32px;color:#2d6a2d}
+.success .icon{font-size:3rem;margin-bottom:12px}
+.success h2{font-size:1.2rem;margin-bottom:8px}
+.success p{font-size:.9rem;color:#888}
+.req{color:#c0392b}
+.footer{text-align:center;margin-top:20px;font-size:.75rem;color:#aaa}
+@media(max-width:500px){.fr{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>RUMONT</h1>
+    <p>MENTORÍAS COMERCIALES</p>
+    <div class="sub">Únete a nuestra Red de Talentos 🌟</div>
+  </div>
+  <div class="card" id="form-card">
+    <p style="font-size:.88rem;color:#666;margin-bottom:20px;line-height:1.6">
+      Al registrarte en la Red de Talentos RUMONT podrás acceder a <strong>oportunidades de empleo</strong>, 
+      beneficios exclusivos y ser parte de nuestra comunidad de crecimiento profesional.
+    </p>
+    <div class="fr">
+      <div class="fg"><label class="fl">Nombre completo <span class="req">*</span></label><input id="t-nom" placeholder="Nombres y apellidos"></div>
+      <div class="fg"><label class="fl">Cédula <span class="req">*</span></label><input id="t-ced" placeholder="1032387724"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Cargo actual <span class="req">*</span></label><input id="t-cargo" placeholder="Mesero, Recepcionista..."></div>
+      <div class="fg"><label class="fl">Empresa donde trabajas</label><input id="t-emp" placeholder="Café Matilde, Hotel..."></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Teléfono <span class="req">*</span></label><input id="t-tel" type="tel" placeholder="300 000 0000"></div>
+      <div class="fg"><label class="fl">Email</label><input id="t-email" type="email" placeholder="tu@correo.com"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Fecha de nacimiento</label><input type="date" id="t-nac"></div>
+      <div class="fg"><label class="fl">Ciudad</label><input id="t-ciu" placeholder="Medellín"></div>
+    </div>
+    <div class="fg"><label class="fl">Estudios / Formación académica</label>
+      <textarea id="t-est" placeholder="Técnico en Gastronomía, Bachiller, Tecnólogo en..."></textarea>
+    </div>
+    <div class="fg"><label class="fl">Experiencia laboral</label>
+      <textarea id="t-exp" placeholder="3 años en restaurantes, manejo de caja, atención al cliente..."></textarea>
+    </div>
+    <div class="fg"><label class="fl">¿Estás abierto a nuevas oportunidades laborales?</label>
+      <select id="t-disp">
+        <option value="Sí">Sí, estoy abierto a oportunidades</option>
+        <option value="Parcial">Según la oferta</option>
+        <option value="No">No por ahora</option>
+      </select>
+    </div>
+    <button class="btn" onclick="enviarTalento()" id="btn-env">REGISTRARME EN LA RED RUMONT</button>
+    <p style="font-size:.72rem;color:#aaa;text-align:center;margin-top:12px">
+      Tu información es privada y solo será utilizada por el equipo RUMONT para oportunidades laborales y beneficios.
+    </p>
+  </div>
+  <div class="card success" id="success-card">
+    <div class="icon">🌟</div>
+    <h2>¡Bienvenido a la Red de Talentos RUMONT!</h2>
+    <p>Tu registro fue exitoso. Te notificaremos cuando haya oportunidades que se ajusten a tu perfil.</p>
+    <p style="margin-top:12px;color:#5a6940;font-weight:600">¡Gracias por ser parte de esta comunidad!</p>
+  </div>
+  <div class="footer">RUMONT · Mentorías Comerciales · rumont-360.netlify.app</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyB842pjszlPzFQvtLWwWr2Kg94ZmF6CIVE",
+  authDomain:"rumont-360.firebaseapp.com",
+  databaseURL:"https://rumont-360-default-rtdb.firebaseio.com",
+  projectId:"rumont-360",
+  storageBucket:"rumont-360.firebasestorage.app",
+  messagingSenderId:"133478036017",
+  appId:"1:133478036017:web:9df2f6c10d286aac159b10"
+});
+var db=firebase.database();
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+
+function enviarTalento(){
+  var nom=document.getElementById('t-nom').value.trim();
+  var ced=document.getElementById('t-ced').value.trim();
+  var cargo=document.getElementById('t-cargo').value.trim();
+  var tel=document.getElementById('t-tel').value.trim();
+  if(!nom||!ced||!cargo||!tel){
+    alert('Por favor completa los campos obligatorios: Nombre, Cédula, Cargo y Teléfono.');return;
+  }
+  var btn=document.getElementById('btn-env');
+  btn.disabled=true;btn.textContent='Enviando...';
+  var id=uid();
+  var obj={
+    id:id,nom:nom,ced:ced,cargo:cargo,
+    emp:document.getElementById('t-emp').value.trim(),
+    tel:tel,email:document.getElementById('t-email').value.trim(),
+    nac:document.getElementById('t-nac').value,
+    ciu:document.getElementById('t-ciu').value.trim(),
+    est:document.getElementById('t-est').value.trim(),
+    exp:document.getElementById('t-exp').value.trim(),
+    cap:'',disponibilidad:document.getElementById('t-disp').value,
+    notas:'Registro público vía link',
+    creado:new Date().toISOString()
+  };
+  // Save to Firebase under talentos_publicos and also add to main rumont data
+  db.ref('talentos_publicos/'+id).set(obj).then(function(){
+    // Also add to main rumont talentos array
+    db.ref('rumont').once('value').then(function(snap){
+      var data=snap.val()||{};
+      var talentos=data.talentos||[];
+      talentos.push(obj);
+      return db.ref('rumont/talentos').set(talentos);
+    }).then(function(){
+      document.getElementById('form-card').style.display='none';
+      document.getElementById('success-card').style.display='block';
+    });
+  }).catch(function(e){
+    btn.disabled=false;btn.textContent='REGISTRARME EN LA RED RUMONT';
+    alert('Error al enviar. Por favor intenta de nuevo.');
+    console.error(e);
+  });
+}
+</script>
+</body>
+</html>
