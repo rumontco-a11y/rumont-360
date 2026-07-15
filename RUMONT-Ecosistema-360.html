@@ -134,6 +134,10 @@ textarea{min-height:80px;resize:vertical}
     <div class="card"><h3>Últimas cuentas de cobro</h3><div class="tw"><table class="tbl"><thead><tr><th>Empresa</th><th>Mes</th><th>Valor</th><th>Estado</th></tr></thead><tbody id="d-cobros"></tbody></table></div></div>
     <div class="card"><h3>Gastos recientes</h3><div id="d-gastos"></div></div>
   </div>
+  <div class="card" style="border-left:4px solid #5a6940;margin-top:16px">
+    <h3>🎂 Cumpleaños este mes — Comunidad RUMONT</h3>
+    <div id="d-cumples" style="margin-top:10px"></div>
+  </div>
 </div>
 
 <!-- CRM -->
@@ -1060,7 +1064,7 @@ function renderKPIs(){
   if(!cls.length){body.innerHTML='<div style="color:var(--ct);padding:2rem">No hay empresas</div>';return;}
   body.innerHTML=cls.map(function(c){
     var kpis=D.kpis.filter(function(k){return k.cid===c.id;});
-    var addBtn='<button class="btn bp bsm" data-cid="'+c.id+'" onclick="abrirKPINuevo(this.dataset.cid)">+ Nuevo KPI</button>';
+    var addBtn='<button class="btn bp bsm" id="kn-'+c.id+'" onclick="abrirKPINuevo(this.id.slice(3))">+ Nuevo KPI</button>';
     if(!kpis.length)return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><h3>'+c.nombre+'</h3>'+addBtn+'</div></div>';
     return '<div class="card">'+
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'+
@@ -1088,8 +1092,8 @@ function renderKPIs(){
               (k.unidad?' <span style="font-size:.75rem;color:var(--ct)">('+k.unidad+')</span>':'')+
             '</div>'+
             '<div style="display:flex;gap:6px">'+
-              '<button class="btn bs bsm" data-kid="'+k.id+'" onclick="abrirKPIById(this.dataset.kid)">✏️ Editar</button>'+
-              '<button class="btn br bsm" data-kid="'+k.id+'" onclick="eliminarKPIById(this.dataset.kid)">🗑️</button>'+
+              '<button class="btn bs bsm" id="ke-'+k.id+'" onclick="abrirKPIById(this.id.slice(3))">✏️ Editar</button>'+
+              '<button class="btn br bsm" id="kd-'+k.id+'" onclick="confirmarElimKPI(this.id.slice(3))">🗑️</button>'+
             '</div>'+
           '</div>'+
           (rels?'<div style="margin-bottom:8px">'+rels+'</div>':'')+
@@ -1184,6 +1188,19 @@ function abrirKPIById(id){
   abrir('m-kpi');
 }
 function eliminarKPIById(id){eliminarKPI(id);}
+function abrirCalGoogle(tid){
+  var t=D.talentos.find(function(x){return x.id===tid;});
+  if(!t||!t.nac){toast('Sin fecha de nacimiento registrada','err');return;}
+  var parts=t.nac.split('-');
+  var anio=new Date().getFullYear();
+  var fecha=anio+parts[1]+parts[2];
+  var titulo=encodeURIComponent('Cumpleanos de '+t.nom+' - Comunidad RUMONT');
+  var detalle=encodeURIComponent('Miembro de la Comunidad de Talentos RUMONT. Recuerda felicitarlo/a! Tel: '+(t.tel||'N/A'));
+  var url='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+titulo+'&dates='+fecha+'/'+fecha+'&details='+detalle+'&recur=RRULE:FREQ%3DYEARLY';
+  window.open(url,'_blank');
+  toast('Abriendo Google Calendar...');
+}
+function confirmarElimKPI(id){if(confirm('¿Eliminar este KPI?'))eliminarKPI(id);}
 function eliminarKPI(id){if(!confirm('¿Eliminar KPI?'))return;D.kpis=D.kpis.filter(function(x){return x.id!==id;});save();renderKPIs();toast('KPI eliminado');}
 
 // ── GASTOS ─────────────────────────────────────
@@ -1571,12 +1588,43 @@ function renderDash(){
   var alertas=[];
   if(vencidas.length)alertas.push('<div style="padding:8px;background:#fdecea;border-radius:6px;margin-bottom:6px;font-size:.83rem">⚠️ <strong>'+vencidas.length+'</strong> actividad(es) vencida(s)</div>');
   if(sinPagar.length)alertas.push('<div style="padding:8px;background:#fff3cd;border-radius:6px;margin-bottom:6px;font-size:.83rem">💳 <strong>'+sinPagar.length+'</strong> cobro(s) pendiente(s) · '+fmt(porCobrar)+'</div>');
-  if(cumMes.length)alertas.push('<div style="padding:8px;background:#e8f4e8;border-radius:6px;margin-bottom:6px;font-size:.83rem">🎂 Cumpleaños: <strong>'+cumMes.map(function(t){return t.nom;}).join(', ')+'</strong></div>');
+  if(cumMes.length){
+    var mArr=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    var cumStr=cumMes.map(function(t){
+      var d=t.nac?t.nac.split('-')[2]:'';
+      var m=t.nac?mArr[parseInt(t.nac.split('-')[1])-1]:'';
+      return '🎂 <strong>'+t.nom+'</strong> — '+d+' de '+m+(t.tel?' · '+t.tel:'');
+    }).join('<br>');
+    alertas.push('<div style="padding:10px;background:#e8f4e8;border-radius:6px;margin-bottom:6px;font-size:.83rem;border-left:3px solid #5a6940"><strong>🎂 Cumpleaños este mes:</strong><br>'+cumStr+'</div>');
+  }
   document.getElementById('d-alertas').innerHTML=alertas.length?alertas.join(''):'<div style="color:var(--ct);font-size:.85rem">✅ Sin alertas activas</div>';
   document.getElementById('d-cobros').innerHTML=D.ccs.slice(-5).reverse().map(function(cc){
     var c=D.cls.find(function(x){return x.id===cc.cid;})||{};
     return '<tr><td>'+(c.nombre||'—')+'</td><td>'+cc.mes+'</td><td>'+fmtNum(cc.valor,cc.moneda)+'</td><td><span class="badge '+(cc.pagado?'ba':'bpe')+'">'+(cc.pagado?'✅':'⏳')+'</span></td></tr>';
   }).join('')||'<tr><td colspan="4" style="color:var(--ct);text-align:center">Sin cobros</td></tr>';
+  // Cumpleaños este mes con botón Google Calendar
+  var mesAct2=new Date().getMonth()+1;
+  var cumMes2=D.talentos.filter(function(t){return t.nac&&parseInt(t.nac.split('-')[1])===mesAct2;});
+  var mNom=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  var dcum=document.getElementById('d-cumples');
+  if(dcum){
+    if(!cumMes2.length){
+      dcum.innerHTML='<div style="color:var(--ct);font-size:.85rem">Sin cumpleaños este mes en la comunidad</div>';
+    } else {
+      dcum.innerHTML=cumMes2.map(function(t){
+        var dia=t.nac?t.nac.split('-')[2]:'';
+        var mesN=t.nac?mNom[parseInt(t.nac.split('-')[1])-1]:'';
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--cs)">'+
+          '<div>'+
+            '<div style="font-weight:600;font-size:.88rem">'+t.nom+'</div>'+
+            '<div style="font-size:.75rem;color:var(--ct)">'+(t.cargo||'')+(t.emp?' · '+t.emp:'')+' · 🎂 '+dia+' de '+mesN+'</div>'+
+            (t.tel?'<div style="font-size:.75rem;color:var(--ct)">📞 '+t.tel+'</div>':'')+
+          '</div>'+
+          '<button class="btn bg bsm" id="cal-'+t.id+'" onclick="abrirCalGoogle(this.id.slice(4))">📅 Calendar</button>'+
+        '</div>';
+      }).join('');
+    }
+  }
   document.getElementById('d-gastos').innerHTML=D.gastos.slice(-4).reverse().map(function(g){
     return '<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--cs);font-size:.82rem"><span>'+g.categoria+' - '+g.descripcion+'</span><span style="color:var(--cr)">'+fmt(g.valor)+'</span></div>';
   }).join('')||'<div style="color:var(--ct);font-size:.85rem">Sin gastos</div>';
