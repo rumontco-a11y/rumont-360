@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RUMONT · Ecosistema 360°</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{--cp:#5a6940;--ca:#8a9e60;--cb:#f4f1e8;--ct:#888;--cr:#c0392b;--cw:#fff;--cd:#222;--cs:#e8e4d8;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Jost',sans-serif;background:var(--cb);color:var(--cd);display:flex;height:100vh;overflow:hidden}
+a{color:var(--cp)}
+.sb{width:220px;min-width:220px;background:#1a1f14;color:#ccc;display:flex;flex-direction:column;height:100vh;overflow-y:auto}
+.sb-logo{padding:24px 20px 16px;border-bottom:1px solid #333}
+.sb-logo h1{font-size:1.3rem;letter-spacing:4px;color:#fff;font-weight:300}
+.sb-logo p{font-size:.65rem;letter-spacing:2px;color:#888;margin-top:2px}
+.sb-sec{padding:16px 20px 4px;font-size:.6rem;letter-spacing:2px;color:#555;text-transform:uppercase}
+.slink{display:flex;align-items:center;gap:10px;padding:9px 20px;cursor:pointer;font-size:.82rem;color:#aaa;transition:.2s}
+.slink:hover,.slink.active{background:#2d3424;color:#c8d4a0}
+.slink span{font-size:1rem}
+.sb-foot{margin-top:auto;padding:16px 20px;border-top:1px solid #333;font-size:.72rem;color:#555}
+.main{flex:1;overflow-y:auto;padding:24px;background:var(--cb)}
+.panel{display:none}.panel.active{display:block}
+.ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.ph h2{font-size:1.3rem;font-weight:400;color:var(--cp)}
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.sc{background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.sv{font-size:1.6rem;font-weight:700;color:var(--cp)}
+.sl{font-size:.75rem;color:var(--ct);margin-top:2px}
+.card{background:#fff;border-radius:10px;padding:18px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.card h3{font-size:.9rem;color:var(--cp);margin-bottom:12px;font-weight:500}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.tbl{width:100%;border-collapse:collapse;font-size:.83rem}
+.tbl th{background:var(--cp);color:#fff;padding:8px 10px;text-align:left;font-weight:500}
+.tbl td{padding:8px 10px;border-bottom:1px solid var(--cs)}
+.tbl tr:hover td{background:#f9f7f0}
+.tw{overflow-x:auto}
+.btn{border:none;border-radius:6px;padding:7px 14px;cursor:pointer;font-size:.8rem;font-weight:500;transition:.2s}
+.bp{background:var(--cp);color:#fff}.bp:hover{background:#4a5730}
+.bg{background:var(--cs);color:var(--cd)}.bg:hover{background:#ddd}
+.br{background:#fdecea;color:var(--cr)}.br:hover{background:#fbc}
+.bs{background:transparent;border:1px solid #ddd;color:var(--cd)}.bs:hover{background:var(--cs)}
+.bsm{font-size:.75rem;padding:5px 10px}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:.72rem;font-weight:600}
+.ba{background:#e8f4e8;color:#2d6a2d}.bpe{background:#fff3cd;color:#856404}.bv{background:#fdecea;color:var(--cr)}.bgr{background:#e9ecef;color:#555}
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:.78rem;color:var(--ct);margin-bottom:4px;font-weight:500}
+input,select,textarea{width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:7px;font-size:.85rem;font-family:inherit;background:#fff}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--cp)}
+textarea{min-height:80px;resize:vertical}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.mov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;padding:16px}
+.mov.show{display:flex}
+.modal{background:#fff;border-radius:14px;width:100%;max-width:640px;max-height:90vh;display:flex;flex-direction:column}
+.mh{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--cs)}
+.mh h3{font-size:1rem;color:var(--cp);font-weight:500}
+.mb{padding:20px;overflow-y:auto;flex:1}
+.mf{padding:14px 20px;border-top:1px solid var(--cs);display:flex;justify-content:flex-end;gap:10px}
+.bx{background:none;border:none;cursor:pointer;font-size:1.3rem;color:var(--ct)}
+.crm-card{background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.07);border-left:4px solid var(--cp)}
+.crm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.tal-card{background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.07);border-left:4px solid var(--ca)}
+.ent-card{background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.07);border-left:4px solid #8a6940;margin-bottom:10px}
+.pb{background:#e9ecef;border-radius:4px;height:6px;margin-top:6px}
+.pf{background:var(--cp);height:6px;border-radius:4px;transition:.3s}
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:8px;color:#fff;font-size:.85rem;z-index:9999;opacity:0;transition:.3s;pointer-events:none}
+.tok{background:var(--cp)}.terr{background:var(--cr)}.toast.show{opacity:1}
+/* KPI multi */
+.kpi-blk{border:1px solid var(--cs);border-radius:8px;padding:14px;margin-bottom:10px;background:#fafaf8}
+.kpi-blk-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+/* Chart containers */
+.chart-wrap{position:relative;height:260px;margin-bottom:16px}
+.inf-empresa{background:#fff;border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.inf-emp-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--cp)}
+.kpi-tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.7rem;background:#e8f0d8;color:var(--cp);margin:2px}
+/* Mobile */
+@media(max-width:768px){body{flex-direction:column}.sb{width:100%;min-width:unset;height:auto;flex-direction:row;flex-wrap:wrap;padding:0;overflow-x:auto}.sb-logo{padding:10px 14px;border-bottom:none}.sb-logo p,.sb-sec,.sb-foot{display:none}.slink{padding:7px 10px;font-size:.72rem;white-space:nowrap}.main{padding:10px}.sg{grid-template-columns:1fr 1fr!important}.grid2,.grid3,.fr,.fr3,.crm-grid{grid-template-columns:1fr!important}.modal{max-width:98vw!important}.tbl{font-size:.73rem}.tbl th,.tbl td{padding:5px 6px}}
+@media print{
+  .sb,.no-print{display:none!important}
+  .main{overflow:visible;padding:0}
+  .inf-logo-hdr{display:block!important}
+  body{background:#fff}
+  .inf-empresa{break-inside:avoid;page-break-inside:avoid}
+  .card{box-shadow:none;border:1px solid #eee}
+  .sc{box-shadow:none;border:1px solid #eee}
+}
+</style>
+</head>
+<body>
+<div class="sb">
+  <div class="sb-logo"><h1>RUMONT</h1><p>MENTORÍAS COMERCIALES · 360°</p></div>
+  <div class="sb-sec">Principal</div>
+  <div class="slink active" data-p="dash" onclick="go('dash')"><span>⊞</span> Dashboard</div>
+  <div class="sb-sec">Clientes</div>
+  <div class="slink" data-p="crm" onclick="go('crm')"><span>👥</span> Empresas CRM</div>
+  <div class="slink" data-p="cobro" onclick="go('cobro')"><span>💳</span> Cuentas de Cobro</div>
+  <div class="sb-sec">Mentoría</div>
+  <div class="slink" data-p="actividades" onclick="go('actividades')"><span>📋</span> Actividades</div>
+  <div class="slink" data-p="entregables" onclick="go('entregables')"><span>🔗</span> Entregables</div>
+  <div class="slink" data-p="kpis" onclick="go('kpis')"><span>📈</span> KPIs por Empresa</div>
+  <div class="sb-sec">RUMONT</div>
+  <div class="slink" data-p="gastos" onclick="go('gastos')"><span>💰</span> Gastos RUMONT</div>
+  <div class="slink" data-p="talentos" onclick="go('talentos')"><span>⭐</span> Base de Talentos</div>
+  <div class="sb-sec">Reportes</div>
+  <div class="slink" data-p="informe" onclick="go('informe')"><span>📊</span> Informe Final</div>
+  <div class="sb-foot">
+    Laura V. Ruiz Martínez<br>C.C. 1032387724 · 3108008313
+    <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn bg bsm" onclick="backupData()">💾 Backup</button>
+      <button class="btn bg bsm" onclick="document.getElementById('restore-file').click()">📂 Restaurar</button>
+    </div>
+    <input type="file" id="restore-file" accept=".json" style="display:none" onchange="restoreData(this)">
+  </div>
+</div>
+<div class="main">
+
+<!-- DASHBOARD -->
+<div id="panel-dash" class="panel active">
+  <div class="ph"><h2>Dashboard RUMONT</h2><span style="font-size:.8rem;color:var(--ct)" id="dash-fecha"></span></div>
+  <div class="sg">
+    <div class="sc"><div class="sv" id="d-activos">0</div><div class="sl">Empresas activas</div></div>
+    <div class="sc"><div class="sv" id="d-facturado">$0</div><div class="sl">Facturado total</div></div>
+    <div class="sc"><div class="sv" id="d-cobrar">$0</div><div class="sl">Por cobrar</div></div>
+    <div class="sc"><div class="sv" id="d-utilidad">$0</div><div class="sl">Utilidad neta</div></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>Empresas activas</h3><div id="d-empresas"></div></div>
+    <div class="card"><h3>⚠️ Alertas</h3><div id="d-alertas"></div></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>Últimas cuentas de cobro</h3><div class="tw"><table class="tbl"><thead><tr><th>Empresa</th><th>Mes</th><th>Valor</th><th>Estado</th></tr></thead><tbody id="d-cobros"></tbody></table></div></div>
+    <div class="card"><h3>Gastos recientes</h3><div id="d-gastos"></div></div>
+  </div>
+  <div class="card" style="border-left:4px solid #5a6940;margin-top:16px">
+    <h3>🎂 Cumpleaños este mes — Comunidad RUMONT</h3>
+    <div id="d-cumples" style="margin-top:10px"></div>
+  </div>
+</div>
+
+<!-- CRM -->
+<div id="panel-crm" class="panel">
+  <div class="ph"><h2>Empresas CRM</h2>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input placeholder="Buscar..." style="width:180px;margin:0" oninput="renderCRM()" id="crm-q">
+      <select style="width:120px;margin:0" onchange="renderCRM()" id="crm-est"><option value="">Todos</option><option>Activo</option><option>Completado</option><option>Nuevo</option></select>
+      <button class="btn bp bsm" onclick="abrirCRM()">+ Nueva empresa</button>
+    </div>
+  </div>
+  <div class="crm-grid" id="crm-g"></div>
+</div>
+
+<!-- COBROS -->
+<div id="panel-cobro" class="panel">
+  <div class="ph"><h2>Cuentas de Cobro</h2>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <select class="vm" id="co-emp" style="width:200px;margin:0" onchange="renderCobro()"><option value="">Todas</option></select>
+      <select style="width:120px;margin:0" onchange="renderCobro()" id="co-est"><option value="">Todos</option><option value="0">Pendientes</option><option value="1">Pagados</option></select>
+      <button class="btn bp bsm" onclick="abrirCobro()">+ Nueva cuenta</button>
+    </div>
+  </div>
+  <div class="tw"><table class="tbl"><thead><tr><th>Empresa</th><th>Mes</th><th>Moneda</th><th>Valor</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody id="co-tbody"></tbody></table></div>
+</div>
+
+<!-- ACTIVIDADES -->
+<div id="panel-actividades" class="panel">
+  <div class="ph"><h2>Actividades</h2>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <select class="vm" id="act-filt-emp" style="width:190px;margin:0" onchange="renderActs()"><option value="">Todas</option></select>
+      <select style="width:120px;margin:0" onchange="renderActs()" id="act-filt-st"><option value="">Todos</option><option>Pendiente</option><option>Ejecutada</option><option>Vencida</option></select>
+      <button class="btn bp bsm" onclick="abrirAct()">+ Nueva actividad</button>
+    </div>
+  </div>
+  <div class="sg" style="grid-template-columns:repeat(4,1fr)">
+    <div class="sc"><div class="sv" id="as-tot">0</div><div class="sl">Total</div></div>
+    <div class="sc"><div class="sv" id="as-pend">0</div><div class="sl">Pendientes</div></div>
+    <div class="sc"><div class="sv" id="as-ejec">0</div><div class="sl">Ejecutadas</div></div>
+    <div class="sc"><div class="sv" id="as-venc" style="color:var(--cr)">0</div><div class="sl">Vencidas</div></div>
+  </div>
+  <div id="acts-body"></div>
+</div>
+
+<!-- ENTREGABLES -->
+<div id="panel-entregables" class="panel">
+  <div class="ph"><h2>Entregables</h2>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <select class="vm" id="ent-filt-emp" style="width:190px;margin:0" onchange="renderEntregables()"><option value="">Todas</option></select>
+      <button class="btn bp bsm" onclick="abrirEnt()">+ Nuevo entregable</button>
+    </div>
+  </div>
+  <div id="ent-body"></div>
+</div>
+
+<!-- KPIs -->
+<div id="panel-kpis" class="panel">
+  <div class="ph"><h2>KPIs por Empresa</h2>
+    <div style="display:flex;gap:8px">
+      <select class="vm" id="kpi-filt" style="width:220px;margin:0" onchange="renderKPIs()"><option value="">Todas</option></select>
+      <button class="btn bp bsm" onclick="abrirKPINuevo()">+ Nuevo KPI</button>
+    </div>
+  </div>
+  <div id="kpis-body"></div>
+</div>
+
+<!-- GASTOS -->
+<div id="panel-gastos" class="panel">
+  <div class="ph"><h2>Gastos RUMONT</h2>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <select style="width:140px;margin:0" onchange="renderGastos()" id="gas-filt-mes"><option value="">Todos los meses</option></select>
+      <button class="btn bp bsm" onclick="abrirGasto()">+ Nuevo gasto</button>
+      <button class="btn bg bsm" onclick="exportGastosExcel()">📥 Excel</button>
+    </div>
+  </div>
+  <div class="sg" style="grid-template-columns:repeat(3,1fr)">
+    <div class="sc"><div class="sv" id="gas-tot">$0</div><div class="sl">Total gastos</div></div>
+    <div class="sc"><div class="sv" id="gas-fij">$0</div><div class="sl">Fijos</div></div>
+    <div class="sc"><div class="sv" id="gas-var">$0</div><div class="sl">Variables</div></div>
+  </div>
+  <div id="gas-body"></div>
+</div>
+
+<!-- TALENTOS -->
+<div id="panel-talentos" class="panel">
+  <div class="ph"><h2>⭐ Base de Talentos</h2>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input placeholder="Buscar..." style="width:180px;margin:0" oninput="renderTalentos()" id="tal-q">
+      <button class="btn bp bsm" onclick="abrirTalento()">+ Registrar</button>
+      <button class="btn bg bsm" onclick="copiarLinkTalento()">🔗 Link público</button>
+      <button class="btn bg bsm" onclick="exportTalentosExcel()">📥 Excel</button>
+    </div>
+  </div>
+  <div class="sg" style="grid-template-columns:repeat(3,1fr)">
+    <div class="sc"><div class="sv" id="tal-tot">0</div><div class="sl">Total talentos</div></div>
+    <div class="sc"><div class="sv" id="tal-emp-tot">0</div><div class="sl">Empresas</div></div>
+    <div class="sc"><div class="sv" id="tal-cum">0</div><div class="sl">Cumpleaños este mes</div></div>
+  </div>
+  <div style="background:#e8f4e8;border-radius:8px;padding:12px;margin-bottom:16px;font-size:.85rem">
+    🔗 <strong>Link de inscripción pública:</strong> <span id="link-publico" style="color:var(--cp)">rumont-360.netlify.app/talento</span>
+    <button class="btn bg bsm" style="margin-left:8px" onclick="copiarLinkTalento()">Copiar link</button>
+  </div>
+  <div class="crm-grid" id="tal-body"></div>
+</div>
+
+<!-- INFORME FINAL -->
+<div id="panel-informe" class="panel">
+  <div class="ph"><h2>📊 Informe Final 360°</h2>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <select class="vm" id="inf-emp" style="width:220px;margin:0"><option value="">Todas las empresas</option></select>
+      <button class="btn bp bsm" onclick="generarInforme()">Generar informe</button>
+      <button class="btn bg bsm no-print" onclick="window.print()">🖨️ PDF</button>
+      <button class="btn bg bsm no-print" onclick="exportInformeExcel()">📥 Excel</button>
+    </div>
+  </div>
+  <div class="card no-print" style="margin-bottom:16px">
+    <h3 style="margin-bottom:12px">⚙️ Personalizar secciones del informe</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:.85rem">
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="inf-show-grafica" checked> Gráfica KPIs</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="inf-show-ejec" checked> Actividades ejecutadas</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="inf-show-pend" checked> Actividades pendientes</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="inf-show-ent" checked> Entregables</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="inf-show-kpi" checked> Tabla KPIs detallada</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="inf-show-cobros" checked> Inversión/Cobros</label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="inf-show-stats"> Ocultar cifras de cobro</label>
+    </div>
+  </div>
+  <div id="inf-body"></div>
+</div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- MODAL CRM -->
+<div class="mov" id="m-crm"><div class="modal" style="max-width:720px">
+  <div class="mh"><h3 id="m-crm-ttl">Nueva empresa</h3><button class="bx" onclick="cerrar('m-crm')">✕</button></div>
+  <div class="mb">
+    <div class="fr">
+      <div class="fg"><label class="fl">Empresa *</label><input id="c-nom" placeholder="Nombre"></div>
+      <div class="fg"><label class="fl">NIT</label><input id="c-nit" placeholder="900.123.456-7"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Sector</label><input id="c-sec" placeholder="Hotelería, Restaurantes..."></div>
+      <div class="fg"><label class="fl">Estado</label><select id="c-est"><option>Activo</option><option>Nuevo</option><option>Completado</option><option>Inactivo</option></select></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Contacto</label><input id="c-cont" placeholder="Nombre del dueño"></div>
+      <div class="fg"><label class="fl">Cargo</label><input id="c-cargo" placeholder="Gerente, Dueño..."></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Email</label><input id="c-email"></div>
+      <div class="fg"><label class="fl">Teléfono</label><input id="c-tel"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Ciudad</label><input id="c-ciu" placeholder="Medellín"></div>
+      <div class="fg"><label class="fl">Moneda principal</label>
+        <select id="c-moneda"><option value="COP">COP - Peso colombiano</option><option value="USD">USD - Dólar</option><option value="EUR">EUR - Euro</option></select>
+      </div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Inicio mentoría</label><input type="date" id="c-ini"></div>
+      <div class="fg"><label class="fl">Fin mentoría</label><input type="date" id="c-fin"></div>
+    </div>
+    <div class="fg"><label class="fl">Plan de pagos (mes a mes)</label>
+      <div id="plan-pagos-tbl"></div>
+      <button class="btn bg bsm" style="margin-top:6px" onclick="agregarMesPago()">+ Agregar mes</button>
+    </div>
+    <div class="fg"><label class="fl">Notas</label><textarea id="c-notas"></textarea></div>
+  </div>
+  <div class="mf"><button class="btn bg" onclick="cerrar('m-crm')">Cancelar</button><button class="btn bp" onclick="guardarCRM()">Guardar</button></div>
+  <input type="hidden" id="c-id">
+</div></div>
+
+<!-- MODAL COBRO -->
+<div class="mov" id="m-cobro"><div class="modal" style="max-width:680px">
+  <div class="mh"><h3 id="m-co-ttl">Nueva cuenta de cobro</h3><button class="bx" onclick="cerrar('m-cobro')">✕</button></div>
+  <div class="mb">
+    <div class="fr">
+      <div class="fg"><label class="fl">Empresa *</label><select class="vm" id="co-cid" onchange="autoFillCobro()"></select></div>
+      <div class="fg"><label class="fl">Mes *</label><input id="co-mes" placeholder="Junio 2026"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Número</label><input id="co-num" placeholder="CC-2026-001"></div>
+      <div class="fg"><label class="fl">Fecha</label><input type="date" id="co-fecha"></div>
+    </div>
+    <div class="fg"><label class="fl">Descripción</label><input id="co-desc" placeholder="Servicio de mentoría comercial"></div>
+    <div class="fr3">
+      <div class="fg"><label class="fl">Moneda</label>
+        <select id="co-moneda" onchange="calcCobro()"><option value="COP">COP</option><option value="USD">USD</option><option value="EUR">EUR</option></select>
+      </div>
+      <div class="fg"><label class="fl">Valor neto *</label><input type="number" id="co-val" placeholder="0" oninput="calcCobro()"></div>
+      <div class="fg"><label class="fl">IVA %</label><input type="number" id="co-iva" value="0" oninput="calcCobro()"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Subtotal</label><input readonly id="co-sub" style="background:#f9f9f9"></div>
+      <div class="fg"><label class="fl">Total</label><input readonly id="co-tot" style="background:#f9f9f9;font-weight:700"></div>
+    </div>
+    <div class="fg"><label class="fl">Notas de pago</label><textarea id="co-notas"></textarea></div>
+    <div class="fg"><label class="fl">Estado</label><select id="co-pagado"><option value="0">Pendiente</option><option value="1">Pagado ✓</option></select></div>
+  </div>
+  <div class="mf"><button class="btn bg" onclick="cerrar('m-cobro')">Cancelar</button><button class="btn bp" onclick="guardarCobro()">Guardar</button></div>
+  <input type="hidden" id="co-id">
+</div></div>
+
+<!-- MODAL VER COBRO -->
+<div class="mov" id="m-ver-cobro"><div class="modal" style="max-width:700px">
+  <div class="mh"><h3>Cuenta de Cobro</h3><button class="bx" onclick="cerrar('m-ver-cobro')">✕</button></div>
+  <div class="mb" id="cobro-preview"></div>
+  <div class="mf no-print">
+    <button class="btn bg" onclick="cerrar('m-ver-cobro')">Cerrar</button>
+    <button class="btn bp" onclick="imprimirCobro()">🖨️ Imprimir</button>
+  </div>
+</div></div>
+
+<!-- MODAL ACTIVIDAD -->
+<div class="mov" id="m-act"><div class="modal">
+  <div class="mh"><h3 id="m-act-ttl">Nueva actividad</h3><button class="bx" onclick="cerrar('m-act')">✕</button></div>
+  <div class="mb">
+    <div class="fr">
+      <div class="fg"><label class="fl">Empresa *</label><select class="vm" id="act-cid"></select></div>
+      <div class="fg"><label class="fl">Tipo</label><select id="act-tipo"><option>Diagnóstico</option><option>Capacitación</option><option>Implementación</option><option>Seguimiento</option><option>Taller</option><option>Visita</option><option>Entregable</option><option>Otro</option></select></div>
+    </div>
+    <div class="fg"><label class="fl">Título *</label><input id="act-tit"></div>
+    <div class="fg"><label class="fl">Descripción</label><textarea id="act-desc"></textarea></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Fecha planeada</label><input type="date" id="act-fp"></div>
+      <div class="fg"><label class="fl">Fecha ejecución</label><input type="date" id="act-fe"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Estado</label><select id="act-st"><option>Pendiente</option><option>Ejecutada</option><option>Cancelada</option></select></div>
+      <div class="fg"><label class="fl">Mes mentoría</label><input id="act-mes" placeholder="Mayo 2026"></div>
+    </div>
+    <div class="fg"><label class="fl">Resultados</label><textarea id="act-res"></textarea></div>
+  </div>
+  <div class="mf"><button class="btn bg" onclick="cerrar('m-act')">Cancelar</button><button class="btn bp" onclick="guardarAct()">Guardar</button></div>
+  <input type="hidden" id="act-id">
+</div></div>
+
+<!-- MODAL ENTREGABLE -->
+<div class="mov" id="m-ent"><div class="modal" style="max-width:680px">
+  <div class="mh"><h3 id="m-ent-ttl">Nuevo entregable</h3><button class="bx" onclick="cerrar('m-ent')">✕</button></div>
+  <div class="mb">
+    <div class="fr">
+      <div class="fg"><label class="fl">Empresa *</label><select class="vm" id="ent-cid"></select></div>
+      <div class="fg"><label class="fl">Tipo</label><select id="ent-tipo"><option>HTML</option><option>Documento</option><option>Contenido Redes</option><option>Presentación</option><option>Capacitación</option><option>Otro</option></select></div>
+    </div>
+    <div class="fg"><label class="fl">Nombre *</label><input id="ent-nom"></div>
+    <div class="fg"><label class="fl">URL / Link</label><input id="ent-url" placeholder="https://..."></div>
+    <div class="fg"><label class="fl">Descripción</label><textarea id="ent-desc"></textarea></div>
+    <div class="fg"><label class="fl">Problemática solucionada *</label><textarea id="ent-prob"></textarea></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Fecha entrega</label><input type="date" id="ent-fecha"></div>
+      <div class="fg"><label class="fl">Mes mentoría</label><input id="ent-mes"></div>
+    </div>
+  </div>
+  <div class="mf"><button class="btn bg" onclick="cerrar('m-ent')">Cancelar</button><button class="btn bp" onclick="guardarEnt()">Guardar</button></div>
+  <input type="hidden" id="ent-id">
+</div></div>
+
+<!-- MODAL KPI -->
+<div class="mov" id="m-kpi"><div class="modal" style="max-width:720px">
+  <div class="mh"><h3 id="m-kpi-ttl">Nuevo KPI</h3><button class="bx" onclick="cerrar('m-kpi')">✕</button></div>
+  <div class="mb">
+    <div class="fr">
+      <div class="fg"><label class="fl">Empresa *</label><select class="vm" id="kpi-cid"></select></div>
+      <div class="fg"><label class="fl">Nombre del KPI *</label><input id="kpi-nom" placeholder="Facturación meseras"></div>
+    </div>
+    <div class="fr3">
+      <div class="fg"><label class="fl">Unidad</label><input id="kpi-uni" placeholder="COP, %, habitaciones..."></div>
+      <div class="fg"><label class="fl">Meta</label><input id="kpi-meta" placeholder="Valor objetivo"></div>
+      <div class="fg"><label class="fl">Categoría</label>
+        <select id="kpi-cat"><option>Ventas</option><option>Ocupación</option><option>Productividad</option><option>Satisfacción</option><option>Operacional</option><option>KPI Cruzado</option><option>Otro</option></select>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">KPIs relacionados (para cruzar análisis)</label>
+      <div id="kpi-rel-list" style="margin-bottom:6px;display:flex;flex-wrap:wrap;gap:4px"></div>
+      <select id="kpi-rel-sel" style="width:auto;display:inline-block;margin:0"><option value="">+ Relacionar con otro KPI</option></select>
+    </div>
+    <div class="fg" id="kpi-cruzado-sec" style="display:none;background:#f0f4e8;border-radius:8px;padding:12px;border-left:3px solid var(--cp)">
+      <label class="fl">⚡ KPI Cruzado automático</label>
+      <p style="font-size:.78rem;color:var(--ct);margin-bottom:10px">Este KPI divide automáticamente dos KPIs relacionados (ej: Facturación ÷ Ocupación)</p>
+      <div class="fr">
+        <div class="fg"><label class="fl">KPI Numerador (÷)</label><select id="kpi-cruz-num" style="margin:0"><option value="">Selecciona...</option></select></div>
+        <div class="fg"><label class="fl">KPI Denominador</label><select id="kpi-cruz-den" style="margin:0"><option value="">Selecciona...</option></select></div>
+      </div>
+      <div class="fg"><label class="fl">Nombre del resultado</label><input id="kpi-cruz-label" placeholder="Ej: Venta por punto de ocupación" style="margin:0"></div>
+    </div>
+    <div class="fg"><label class="fl">Descripción / Cómo se mide</label><textarea id="kpi-desc"></textarea></div>
+    <hr style="margin:12px 0;border-color:var(--cs)">
+    <h4 style="font-size:.85rem;color:var(--cp);margin-bottom:10px">📅 Lecturas mensuales</h4>
+    <div class="fr3">
+      <div class="fg"><label class="fl">Mes</label><input id="kl-mes" placeholder="Mayo 2026"></div>
+      <div class="fg"><label class="fl">Sin RUMONT</label><input type="number" id="kl-ant" placeholder="0"></div>
+      <div class="fg"><label class="fl">Con RUMONT</label><input type="number" id="kl-act" placeholder="0"></div>
+    </div>
+    <div class="fg"><label class="fl">Observaciones</label><textarea id="kl-obs" style="min-height:50px" placeholder="Factores que influyeron (ej: ocupación 60%)"></textarea></div>
+    <button class="btn bs bsm" onclick="agregarLectura()">+ Agregar lectura</button>
+    <div id="kpi-lec-list" style="margin-top:10px"></div>
+  </div>
+  <div class="mf"><button class="btn bg" onclick="cerrar('m-kpi')">Cancelar</button><button class="btn bp" onclick="guardarKPI()">Guardar KPI</button></div>
+  <input type="hidden" id="kpi-id">
+</div></div>
+
+<!-- MODAL GASTO -->
+<div class="mov" id="m-gasto"><div class="modal">
+  <div class="mh"><h3 id="m-gas-ttl">Nuevo gasto</h3><button class="bx" onclick="cerrar('m-gasto')">✕</button></div>
+  <div class="mb">
+    <div class="fr">
+      <div class="fg"><label class="fl">Categoría *</label>
+        <select id="gas-cat"><option>Membresía/Suscripción</option><option>Cloud</option><option>Celular</option><option>Transporte</option><option>Parqueadero</option><option>Alimentación</option><option>Otro</option></select>
+      </div>
+      <div class="fg"><label class="fl">Periodicidad</label>
+        <select id="gas-tipo">
+          <option value="Fijo Mensual">Fijo Mensual</option>
+          <option value="Fijo Anual">Fijo Anual</option>
+          <option value="Fijo Quincenal">Fijo Quincenal</option>
+          <option value="Variable">Variable (eventual)</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Descripción *</label><input id="gas-desc" placeholder="Canva anual, Cloud AWS..."></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Valor *</label><input type="number" id="gas-val"></div>
+      <div class="fg"><label class="fl">Mes</label><input id="gas-mes" placeholder="Junio 2026"></div>
+    </div>
+    <div class="fg"><label class="fl">Fecha</label><input type="date" id="gas-fecha"></div>
+    <div class="fg"><label class="fl">Notas</label><textarea id="gas-notas" style="min-height:50px"></textarea></div>
+  </div>
+  <div class="mf"><button class="btn bg" onclick="cerrar('m-gasto')">Cancelar</button><button class="btn bp" onclick="guardarGasto()">Guardar</button></div>
+  <input type="hidden" id="gas-id">
+</div></div>
+
+<!-- MODAL TALENTO -->
+<div class="mov" id="m-talento"><div class="modal" style="max-width:700px">
+  <div class="mh"><h3 id="m-tal-ttl">Registrar talento</h3><button class="bx" onclick="cerrar('m-talento')">✕</button></div>
+  <div class="mb">
+    <div class="fr">
+      <div class="fg"><label class="fl">Nombre completo *</label><input id="tal-nom"></div>
+      <div class="fg"><label class="fl">Cédula *</label><input id="tal-ced"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Cargo actual *</label><input id="tal-cargo"></div>
+      <div class="fg"><label class="fl">Empresa donde trabaja</label><input id="tal-emp"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Teléfono</label><input id="tal-tel"></div>
+      <div class="fg"><label class="fl">Email</label><input id="tal-email"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Fecha de nacimiento</label><input type="date" id="tal-nac"></div>
+      <div class="fg"><label class="fl">Ciudad</label><input id="tal-ciu"></div>
+    </div>
+    <div class="fg"><label class="fl">Estudios</label><textarea id="tal-est" style="min-height:50px"></textarea></div>
+    <div class="fg"><label class="fl">Experiencia</label><textarea id="tal-exp" style="min-height:50px"></textarea></div>
+    <div class="fg"><label class="fl">Capacitaciones RUMONT</label><textarea id="tal-cap" style="min-height:50px"></textarea></div>
+    <div class="fg"><label class="fl">Disponibilidad</label>
+      <select id="tal-disp"><option value="Sí">Sí, abierto a oportunidades</option><option value="No">No por ahora</option><option value="Parcial">Parcialmente</option></select>
+    </div>
+    <div class="fg"><label class="fl">Notas</label><textarea id="tal-notas" style="min-height:50px"></textarea></div>
+  </div>
+  <div class="mf"><button class="btn bg" onclick="cerrar('m-talento')">Cancelar</button><button class="btn bp" onclick="guardarTalento()">Guardar</button></div>
+  <input type="hidden" id="tal-id">
+</div></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+(function(){
+  try{
+    firebase.initializeApp({
+      apiKey:"AIzaSyB842pjszlPzFQvtLWwWr2Kg94ZmF6CIVE",
+      authDomain:"rumont-360.firebaseapp.com",
+      databaseURL:"https://rumont-360-default-rtdb.firebaseio.com",
+      projectId:"rumont-360",
+      storageBucket:"rumont-360.firebasestorage.app",
+      messagingSenderId:"133478036017",
+      appId:"1:133478036017:web:9df2f6c10d286aac159b10"
+    });
+    var fbRef=firebase.database().ref('rumont');
+    window.fbRef=fbRef;
+
+    // ESCUCHAR CAMBIOS EN TIEMPO REAL
+    // Cada vez que cualquier dispositivo guarde, todos se actualizan
+    fbRef.on('value', function(snap){
+      var d=snap.val();
+      if(d&&d.cls&&d.cls.length>0){
+        var nuevo=JSON.stringify(d);
+        var actual=JSON.stringify(D);
+        // Solo actualizar si los datos son diferentes
+        if(nuevo!==actual){
+          D.cls=d.cls||[];
+          D.ccs=d.ccs||[];
+          D.acts=d.acts||[];
+          D.ents=d.ents||[];
+          D.kpis=d.kpis||[];
+          D.gastos=d.gastos||[];
+          D.talentos=d.talentos||[];
+          localStorage.setItem('rumont_v7',JSON.stringify(D));
+          buildVMs();
+          renderDash();
+          // Actualizar panel activo
+          var panelActivo=document.querySelector('.panel.active');
+          if(panelActivo){
+            var id=panelActivo.id.replace('panel-','');
+            var fns={crm:renderCRM,cobro:renderCobro,actividades:renderActs,
+              entregables:renderEntregables,kpis:renderKPIs,gastos:renderGastos,
+              talentos:renderTalentos};
+            if(fns[id])fns[id]();
+          }
+          console.log('✅ Datos actualizados desde Firebase en tiempo real');
+        }
+      }
+    });
+
+    // GUARDAR en Firebase + localStorage
+    window.save=function(){
+      localStorage.setItem('rumont_v7',JSON.stringify(D));
+      fbRef.set(JSON.parse(JSON.stringify(D))).then(function(){
+        console.log('✅ Guardado en Firebase');
+      }).catch(function(e){
+        console.warn('Error guardando en Firebase:',e);
+      });
+    };
+
+    console.log('🔥 Firebase tiempo real conectado - RUMONT 360');
+  }catch(e){
+    console.warn('Firebase error:',e);
+  }
+})();
+</script>
+<script>
+const SK='rumont_v7';
+let D={cls:[],ccs:[],acts:[],ents:[],kpis:[],gastos:[],talentos:[]};
+
+function save(){localStorage.setItem(SK,JSON.stringify(D));if(window.fbRef)try{window.fbRef.set(D);}catch(e){}}
+function load(){
+  ['rumont_v6','rumont_v5'].forEach(function(k){
+    if(localStorage.getItem(k)&&!localStorage.getItem(SK)){
+      try{var o=JSON.parse(localStorage.getItem(k));D={cls:o.cls||[],ccs:o.ccs||[],acts:o.acts||[],ents:o.ents||[],kpis:o.kpis||[],gastos:o.gastos||[],talentos:o.talentos||[]};save();}catch(e){}
+    }
+  });
+  var s=localStorage.getItem(SK);
+  if(s){try{var p=JSON.parse(s);D={cls:p.cls||[],ccs:p.ccs||[],acts:p.acts||[],ents:p.ents||[],kpis:p.kpis||[],gastos:p.gastos||[],talentos:p.talentos||[]};}catch(e){}}
+}
+function backupData(){var a=document.createElement('a');a.href='data:application/json,'+encodeURIComponent(JSON.stringify(D,null,2));a.download='RUMONT-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();toast('Backup descargado ✓');}
+function restoreData(inp){var f=inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(e){try{D=JSON.parse(e.target.result);save();buildVMs();go('dash');toast('Datos restaurados ✓');}catch(err){toast('Error al restaurar','err');}};r.readAsText(f);inp.value='';}
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+function fmtNum(n,mon){
+  mon=mon||'COP';
+  if(mon==='COP')return new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(n||0);
+  if(mon==='USD')return '$'+parseFloat(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' USD';
+  if(mon==='EUR')return '€'+parseFloat(n||0).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2});
+  return n;
+}
+function fmt(n){return fmtNum(n,'COP');}
+function fmtKPI(val,unit){
+  if(!val&&val!==0)return '—';
+  unit=(unit||'').toUpperCase();
+  if(unit==='COP')return new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(val);
+  if(unit==='%')return parseFloat(val).toFixed(2)+'%';
+  if(unit==='USD')return '$'+parseFloat(val).toLocaleString('en-US',{minimumFractionDigits:2})+ ' USD';
+  if(unit==='EUR')return '€'+parseFloat(val).toLocaleString('es-ES',{minimumFractionDigits:2});
+  // Check if it looks like a currency value (large number)
+  if(parseFloat(val)>1000&&unit!=='%')return new Intl.NumberFormat('es-CO',{maximumFractionDigits:0}).format(val)+(unit?' '+unit:'');
+  return parseFloat(val).toLocaleString('es-CO',{maximumFractionDigits:2})+(unit?' '+unit:'');
+}
+function fmtF(s){if(!s)return '—';var p=s.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
+function toast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(type==='err'?'terr':'tok');t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2800);}
+function venc(a){return a.estado==='Pendiente'&&a.fechaP&&new Date(a.fechaP)<new Date(new Date().toDateString());}
+function cerrar(id){document.getElementById(id).classList.remove('show');}
+function abrir(id){document.getElementById(id).classList.add('show');}
+
+function go(id){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.slink').forEach(function(l){l.classList.remove('active');});
+  var p=document.getElementById('panel-'+id);if(p)p.classList.add('active');
+  document.querySelectorAll('[data-p="'+id+'"]').forEach(function(l){l.classList.add('active');});
+  var fns={dash:renderDash,crm:renderCRM,cobro:renderCobro,actividades:renderActs,entregables:renderEntregables,kpis:renderKPIs,gastos:renderGastos,talentos:renderTalentos,informe:function(){}};
+  if(fns[id])fns[id]();
+}
+
+function buildVMs(){
+  var opts=D.cls.map(function(c){return '<option value="'+c.id+'">'+c.nombre+'</option>';}).join('');
+  document.querySelectorAll('.vm').forEach(function(s){
+    var cur=s.value;
+    var base='<option value="">'+( s.id&&(s.id.startsWith('co-')||s.id.startsWith('inf-'))?'Todas las empresas':'Selecciona...')+'</option>';
+    s.innerHTML=base+opts;if(cur)s.value=cur;
+  });
+  var te=document.getElementById('tal-filt-emp');
+  if(te){te.innerHTML='<option value="">Todas</option>'+D.cls.map(function(c){return '<option>'+c.nombre+'</option>';}).join('');}
+  // KPI relacionados selector
+  var krs=document.getElementById('kpi-rel-sel');
+  if(krs){krs.innerHTML='<option value="">+ Relacionar con otro KPI</option>'+D.kpis.map(function(k){return '<option value="'+k.id+'">'+k.nombre+'</option>';}).join('');}
+}
+
+// ── PLAN DE PAGOS ──────────────────────────────
+var _planPagos=[];
+function agregarMesPago(mes,val,mon){
+  _planPagos.push({mes:mes||'',valor:val||0,moneda:mon||'COP'});
+  renderPlanPagos();
+}
+function renderPlanPagos(){
+  var div=document.getElementById('plan-pagos-tbl');
+  if(!div)return;
+  div.innerHTML=_planPagos.map(function(p,i){
+    return '<div style="display:flex;gap:6px;margin-bottom:6px;align-items:center">'+
+      '<input placeholder="Mes 1, Mes 2..." value="'+p.mes+'" style="margin:0;flex:1" onchange="_planPagos['+i+'].mes=this.value">'+
+      '<input type="number" placeholder="Valor" value="'+p.valor+'" style="margin:0;width:120px" onchange="_planPagos['+i+'].valor=parseFloat(this.value)||0">'+
+      '<select style="margin:0;width:90px" onchange="_planPagos['+i+'].moneda=this.value">'+
+        '<option'+(p.moneda==='COP'?' selected':'')+'>COP</option>'+
+        '<option'+(p.moneda==='USD'?' selected':'')+'>USD</option>'+
+        '<option'+(p.moneda==='EUR'?' selected':'')+'>EUR</option>'+
+      '</select>'+
+      '<button class="btn br bsm" onclick="_planPagos.splice('+i+',1);renderPlanPagos()">✕</button>'+
+    '</div>';
+  }).join('');
+}
+
+// ── CRM ────────────────────────────────────────
+function abrirCRM(id){
+  var c=id?D.cls.find(function(x){return x.id===id;}):null;
+  document.getElementById('c-id').value=id||'';
+  document.getElementById('m-crm-ttl').textContent=id?'Editar empresa':'Nueva empresa';
+  ['nom','nit','sec','cont','cargo','email','tel','ciu','notas'].forEach(function(f){document.getElementById('c-'+f).value=c?c[f]||'':'';});
+  document.getElementById('c-est').value=c?c.estado||'Activo':'Activo';
+  document.getElementById('c-ini').value=c?c.inicio||'':'';
+  document.getElementById('c-fin').value=c?c.fin||'':'';
+  document.getElementById('c-moneda').value=c?c.moneda||'COP':'COP';
+  _planPagos=c&&c.planPagos?JSON.parse(JSON.stringify(c.planPagos)):[];
+  if(!_planPagos.length&&c&&c.valor)_planPagos.push({mes:'Mes 1',valor:c.valor,moneda:c.moneda||'COP'});
+  renderPlanPagos();
+  abrir('m-crm');
+}
+function guardarCRM(){
+  var nom=document.getElementById('c-nom').value.trim();
+  if(!nom){toast('Nombre requerido','err');return;}
+  var id=document.getElementById('c-id').value||uid();
+  var ex=D.cls.find(function(x){return x.id===id;})||{};
+  var obj={id:id,nombre:nom,nit:document.getElementById('c-nit').value.trim(),sector:document.getElementById('c-sec').value.trim(),
+    contacto:document.getElementById('c-cont').value.trim(),cargo:document.getElementById('c-cargo').value.trim(),
+    email:document.getElementById('c-email').value.trim(),tel:document.getElementById('c-tel').value.trim(),
+    ciudad:document.getElementById('c-ciu').value.trim(),notas:document.getElementById('c-notas').value.trim(),
+    estado:document.getElementById('c-est').value,inicio:document.getElementById('c-ini').value,fin:document.getElementById('c-fin').value,
+    moneda:document.getElementById('c-moneda').value,planPagos:JSON.parse(JSON.stringify(_planPagos)),
+    valor:_planPagos.length?_planPagos[0].valor:0,creado:ex.creado||new Date().toISOString()};
+  var idx=D.cls.findIndex(function(x){return x.id===id;});
+  if(idx>=0)D.cls[idx]=obj;else D.cls.push(obj);
+  save();cerrar('m-crm');buildVMs();renderCRM();toast(idx>=0?'Empresa actualizada':'Empresa creada');
+}
+function eliminarCRM(id){
+  if(!confirm('¿Eliminar esta empresa y todos sus datos?'))return;
+  D.cls=D.cls.filter(function(x){return x.id!==id;});
+  D.ccs=D.ccs.filter(function(x){return x.cid!==id;});
+  D.acts=D.acts.filter(function(x){return x.cid!==id;});
+  D.ents=D.ents.filter(function(x){return x.cid!==id;});
+  D.kpis=D.kpis.filter(function(x){return x.cid!==id;});
+  save();buildVMs();renderCRM();toast('Empresa eliminada');
+}
+function renderCRM(){
+  var q=document.getElementById('crm-q').value.toLowerCase();
+  var est=document.getElementById('crm-est').value;
+  var list=D.cls.filter(function(c){return(!q||c.nombre.toLowerCase().includes(q)||(c.sector||'').toLowerCase().includes(q))&&(!est||c.estado===est);});
+  var g=document.getElementById('crm-g');
+  if(!list.length){g.innerHTML='<div style="color:var(--ct);padding:2rem;grid-column:1/-1">No hay empresas. Crea la primera.</div>';return;}
+  g.innerHTML=list.map(function(c){
+    var ccs=D.ccs.filter(function(x){return x.cid===c.id;});
+    var pag=ccs.filter(function(x){return x.pagado;}).reduce(function(s,x){return s+x.valor;},0);
+    var tot=ccs.reduce(function(s,x){return s+x.valor;},0);
+    var acts=D.acts.filter(function(x){return x.cid===c.id;});
+    var ejec=acts.filter(function(x){return x.estado==='Ejecutada';}).length;
+    var pct=acts.length?Math.round(ejec/acts.length*100):0;
+    var bc=c.estado==='Activo'?'ba':c.estado==='Completado'?'bgr':'bpe';
+    var planStr=c.planPagos&&c.planPagos.length?c.planPagos.map(function(p){return p.mes+': '+fmtNum(p.valor,p.moneda);}).join(' | '):'—';
+    return '<div class="crm-card">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">'+
+        '<h4 style="font-size:.95rem">'+c.nombre+'</h4><span class="badge '+bc+'">'+c.estado+'</span>'+
+      '</div>'+
+      '<div style="font-size:.75rem;color:var(--ct);margin-bottom:6px">'+(c.sector||'—')+' - '+(c.ciudad||'')+'</div>'+
+      '<div style="font-size:.78rem;margin-bottom:8px">'+
+        (c.contacto?'👤 '+c.contacto:'')+(c.tel?' · 📞 '+c.tel:'')+
+        (c.nit?'<br>NIT: '+c.nit:'')+
+        (c.inicio?'<br>📅 '+fmtF(c.inicio)+' → '+fmtF(c.fin):'')+
+        '<br>💰 '+planStr+
+      '</div>'+
+      '<div style="display:flex;justify-content:space-between;font-size:.78rem;color:var(--ct);margin-bottom:4px">'+
+        '<span>Cobrado: '+fmt(pag)+' / '+fmt(tot)+'</span><span>'+ejec+'/'+acts.length+' act.</span>'+
+      '</div>'+
+      '<div class="pb"><div class="pf" style="width:'+pct+'%"></div></div>'+
+      '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">'+
+        '<button class="btn bs bsm" onclick="abrirCRM(\''+c.id+'\')">✏️ Editar</button>'+
+        '<button class="btn bs bsm" onclick="abrirCobro(\''+c.id+'\')">💳 Cobro</button>'+
+        '<button class="btn bs bsm" onclick="abrirAct(\''+c.id+'\')">📋 Actividad</button>'+
+        '<button class="btn bs bsm" onclick="abrirEnt(\''+c.id+'\')">🔗 Entregable</button>'+
+        '<button class="btn br bsm" onclick="eliminarCRM(\''+c.id+'\')">🗑️</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+// ── COBROS ─────────────────────────────────────
+function autoFillCobro(){
+  var cid=document.getElementById('co-cid').value;
+  var c=D.cls.find(function(x){return x.id===cid;});
+  if(c){document.getElementById('co-moneda').value=c.moneda||'COP';}
+  calcCobro();
+}
+function abrirCobro(cid,id){
+  var cc=id?D.ccs.find(function(x){return x.id===id;}):null;
+  document.getElementById('co-id').value=id||'';
+  document.getElementById('m-co-ttl').textContent=id?'Editar cuenta':'Nueva cuenta de cobro';
+  buildVMs();
+  document.getElementById('co-cid').value=cid||(cc?cc.cid:'');
+  document.getElementById('co-mes').value=cc?cc.mes||'':'';
+  document.getElementById('co-num').value=cc?cc.num||'':'';
+  document.getElementById('co-fecha').value=cc?cc.fecha:new Date().toISOString().slice(0,10);
+  document.getElementById('co-desc').value=cc?cc.desc||'':'Servicio de mentoría comercial';
+  document.getElementById('co-moneda').value=cc?cc.moneda||'COP':'COP';
+  document.getElementById('co-val').value=cc?cc.valor||'':'';
+  document.getElementById('co-iva').value=cc?cc.ivap||0:0;
+  document.getElementById('co-notas').value=cc?cc.notas||'':'Pago a: Bancolombia - Cuenta de ahorros\nLaura Viviana Ruiz Martínez - C.C. 1032387724';
+  document.getElementById('co-pagado').value=cc?(cc.pagado?'1':'0'):'0';
+  if(!id&&cid){autoFillCobro();}
+  calcCobro();abrir('m-cobro');
+}
+function calcCobro(){
+  var v=parseFloat(document.getElementById('co-val').value)||0;
+  var ivap=parseFloat(document.getElementById('co-iva').value)||0;
+  var mon=document.getElementById('co-moneda').value||'COP';
+  document.getElementById('co-sub').value=fmtNum(v,mon);
+  document.getElementById('co-tot').value=fmtNum(v*(1+ivap/100),mon);
+}
+function guardarCobro(){
+  var cid=document.getElementById('co-cid').value;
+  var val=parseFloat(document.getElementById('co-val').value)||0;
+  var mes=document.getElementById('co-mes').value.trim();
+  if(!cid){toast('Selecciona empresa','err');return;}
+  if(!mes){toast('Ingresa el mes','err');return;}
+  if(!val){toast('Ingresa el valor','err');return;}
+  var id=document.getElementById('co-id').value||uid();
+  var ivap=parseFloat(document.getElementById('co-iva').value)||0;
+  var mon=document.getElementById('co-moneda').value||'COP';
+  var obj={id:id,cid:cid,mes:mes,num:document.getElementById('co-num').value,fecha:document.getElementById('co-fecha').value,
+    desc:document.getElementById('co-desc').value,valor:val,moneda:mon,ivap:ivap,iva:val*(ivap/100),total:val*(1+ivap/100),
+    notas:document.getElementById('co-notas').value,pagado:document.getElementById('co-pagado').value==='1',creado:new Date().toISOString()};
+  var idx=D.ccs.findIndex(function(x){return x.id===id;});
+  if(idx>=0)D.ccs[idx]=obj;else D.ccs.push(obj);
+  save();cerrar('m-cobro');renderCobro();toast('Cuenta guardada');
+}
+function togPago(id){
+  var cc=D.ccs.find(function(x){return x.id===id;});
+  if(cc){cc.pagado=!cc.pagado;save();renderCobro();toast(cc.pagado?'✅ Pagado':'⏳ Pendiente');}
+}
+function verCobro(id){
+  var cc=D.ccs.find(function(x){return x.id===id;});if(!cc)return;
+  var c=D.cls.find(function(x){return x.id===cc.cid;})||{};
+  var mon=cc.moneda||'COP';
+  document.getElementById('cobro-preview').innerHTML=
+    '<div id="print-cobro" style="font-family:Georgia,serif;padding:1rem">'+
+      '<div style="display:flex;justify-content:space-between;border-bottom:3px solid #5a6940;padding-bottom:16px;margin-bottom:20px">'+
+        '<div><div style="font-size:1.8rem;font-weight:700;letter-spacing:4px;color:#5a6940">RUMONT</div>'+
+        '<div style="font-size:.75rem;letter-spacing:2px;color:#888">MENTORÍAS COMERCIALES</div></div>'+
+        '<div style="text-align:right"><div style="font-size:1.1rem;font-weight:700;color:#5a6940">CUENTA DE COBRO</div>'+
+        (cc.num?'<div style="color:#888">'+cc.num+'</div>':'')+
+        '<div style="font-size:.85rem">'+fmtF(cc.fecha)+'</div></div>'+
+      '</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">'+
+        '<div><div style="font-size:.7rem;text-transform:uppercase;color:#888;margin-bottom:4px">Facturar a:</div>'+
+        '<div style="font-weight:700">'+(c.nombre||'—')+'</div>'+(c.nit?'<div style="font-size:.85rem">NIT: '+c.nit+'</div>':'')+(c.contacto?'<div style="font-size:.85rem">'+c.contacto+'</div>':'')+'</div>'+
+        '<div><div style="font-size:.7rem;text-transform:uppercase;color:#888;margin-bottom:4px">Emitido por:</div>'+
+        '<div style="font-weight:700">Laura Viviana Ruiz Martínez</div>'+
+        '<div style="font-size:.85rem">C.C. 1032387724</div><div style="font-size:.85rem">📞 3108008313</div></div>'+
+      '</div>'+
+      '<table style="width:100%;border-collapse:collapse;margin-bottom:20px">'+
+        '<thead><tr style="background:#5a6940;color:#fff"><th style="padding:8px;text-align:left">Descripción</th><th style="padding:8px;text-align:right">Valor neto antes de IVA</th></tr></thead>'+
+        '<tbody><tr style="border-bottom:1px solid #eee"><td style="padding:10px">'+(cc.desc||'Servicio de mentoría comercial')+'<br><span style="font-size:.8rem;color:#888">Período: '+cc.mes+'</span></td>'+
+        '<td style="padding:10px;text-align:right;font-weight:600">'+fmtNum(cc.valor,mon)+'</td></tr></tbody>'+
+      '</table>'+
+      '<div style="text-align:right">'+
+        '<div style="font-size:.85rem;color:#888">Valor neto antes de IVA: '+fmtNum(cc.valor,mon)+'</div>'+
+        (cc.ivap?'<div style="font-size:.85rem;color:#888">IVA ('+cc.ivap+'%): '+fmtNum(cc.iva,mon)+'</div>':'')+
+        '<div style="font-size:1.2rem;font-weight:700;color:#5a6940;border-top:2px solid #5a6940;margin-top:8px;padding-top:8px">TOTAL: '+fmtNum(cc.total,mon)+'</div>'+
+      '</div>'+
+      (cc.notas?'<div style="margin-top:20px;padding:12px;background:#f4f1e8;border-radius:6px;font-size:.82rem"><strong>Datos de pago:</strong><br>'+cc.notas.replace(/\n/g,'<br>')+'</div>':'')+
+    '</div>';
+  abrir('m-ver-cobro');
+}
+function imprimirCobro(){
+  var w=window.open('','_blank');
+  var bd=document.getElementById('print-cobro').outerHTML;
+  w.document.write('<html><head><title>Cuenta de Cobro</title><style>body{font-family:Georgia,serif;padding:2rem;max-width:700px;margin:auto}</style></head><body>'+bd+'<\/body><\/html>');
+  w.document.close();w.print();
+}
+function eliminarCobro(id){if(!confirm('¿Eliminar?'))return;D.ccs=D.ccs.filter(function(x){return x.id!==id;});save();renderCobro();toast('Eliminada');}
+function exportCobroExcel(cid){
+  var nombre=(D.cls.find(function(x){return x.id===cid;})||{}).nombre||'empresa';
+  var data=D.ccs.filter(function(x){return x.cid===cid;}).map(function(cc){return{'Mes':cc.mes,'Número':cc.num||'','Descripción':cc.desc||'','Moneda':cc.moneda||'COP','Valor Neto':cc.valor,'IVA':cc.iva||0,'Total':cc.total,'Pagado':cc.pagado?'Sí':'No','Fecha':fmtF(cc.fecha)};});
+  if(!data.length){toast('Sin datos','err');return;}
+  var ws=XLSX.utils.json_to_sheet(data);var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Cobros');
+  XLSX.writeFile(wb,'RUMONT-Cobros-'+nombre+'.xlsx');toast('Excel descargado ✓');
+}
+function renderCobro(){
+  var cid=document.getElementById('co-emp').value;
+  var est=document.getElementById('co-est').value;
+  var list=D.ccs.filter(function(x){return(!cid||x.cid===cid)&&(est===''||x.pagado===(est==='1'));});
+  var tb=document.getElementById('co-tbody');
+  if(!list.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--ct)">No hay cuentas</td></tr>';return;}
+  tb.innerHTML=list.map(function(cc){
+    var c=D.cls.find(function(x){return x.id===cc.cid;})||{};
+    return '<tr>'+
+      '<td><strong>'+(c.nombre||'—')+'</strong></td>'+
+      '<td>'+cc.mes+'</td>'+
+      '<td><span class="badge bgr">'+(cc.moneda||'COP')+'</span></td>'+
+      '<td>'+fmtNum(cc.total,cc.moneda)+'</td>'+
+      '<td><span class="badge '+(cc.pagado?'ba':'bpe')+'">'+(cc.pagado?'✅ Pagado':'⏳ Pendiente')+'</span></td>'+
+      '<td>'+fmtF(cc.fecha)+'</td>'+
+      '<td style="display:flex;gap:4px;flex-wrap:wrap">'+
+        '<button class="btn bs bsm" onclick="verCobro(\''+cc.id+'\')">👁️</button>'+
+        '<button class="btn bs bsm" onclick="togPago(\''+cc.id+'\')">'+(cc.pagado?'↩️':'✅')+'</button>'+
+        '<button class="btn bs bsm" onclick="abrirCobro(\''+cc.cid+'\',\''+cc.id+'\')">✏️</button>'+
+        '<button class="btn bs bsm" onclick="exportCobroExcel(\''+cc.cid+'\')">📥</button>'+
+        '<button class="btn br bsm" onclick="eliminarCobro(\''+cc.id+'\')">🗑️</button>'+
+      '</td>'+
+    '</tr>';
+  }).join('');
+}
+
+// ── ACTIVIDADES ────────────────────────────────
+function abrirAct(cid,id){
+  var a=id?D.acts.find(function(x){return x.id===id;}):null;
+  document.getElementById('act-id').value=id||'';
+  document.getElementById('m-act-ttl').textContent=id?'Editar actividad':'Nueva actividad';
+  buildVMs();
+  document.getElementById('act-cid').value=cid||(a?a.cid:'');
+  document.getElementById('act-tipo').value=a?a.tipo||'Diagnóstico':'Diagnóstico';
+  document.getElementById('act-tit').value=a?a.titulo||'':'';
+  document.getElementById('act-desc').value=a?a.descripcion||'':'';
+  document.getElementById('act-fp').value=a?a.fechaP||'':'';
+  document.getElementById('act-fe').value=a?a.fechaE||'':'';
+  document.getElementById('act-st').value=a?a.estado||'Pendiente':'Pendiente';
+  document.getElementById('act-mes').value=a?a.mes||'':'';
+  document.getElementById('act-res').value=a?a.resultados||'':'';
+  abrir('m-act');
+}
+function guardarAct(){
+  var cid=document.getElementById('act-cid').value;
+  var tit=document.getElementById('act-tit').value.trim();
+  if(!cid){toast('Selecciona empresa','err');return;}
+  if(!tit){toast('Título requerido','err');return;}
+  var id=document.getElementById('act-id').value||uid();
+  var c=D.cls.find(function(x){return x.id===cid;});
+  var obj={id:id,cid:cid,empresa:c?c.nombre:'',tipo:document.getElementById('act-tipo').value,titulo:tit,
+    descripcion:document.getElementById('act-desc').value,fechaP:document.getElementById('act-fp').value,
+    fechaE:document.getElementById('act-fe').value,estado:document.getElementById('act-st').value,
+    mes:document.getElementById('act-mes').value,resultados:document.getElementById('act-res').value,creado:new Date().toISOString()};
+  var idx=D.acts.findIndex(function(x){return x.id===id;});
+  if(idx>=0)D.acts[idx]=obj;else D.acts.push(obj);
+  save();cerrar('m-act');renderActs();toast('Actividad guardada');
+}
+function renderActs(){
+  var cid=document.getElementById('act-filt-emp').value;
+  var st=document.getElementById('act-filt-st').value;
+  var list=D.acts.filter(function(a){
+    var ef=venc(a)?'Vencida':a.estado;
+    return(!cid||a.cid===cid)&&(!st||ef===st);
+  });
+  document.getElementById('as-tot').textContent=D.acts.length;
+  document.getElementById('as-pend').textContent=D.acts.filter(function(a){return a.estado==='Pendiente'&&!venc(a);}).length;
+  document.getElementById('as-ejec').textContent=D.acts.filter(function(a){return a.estado==='Ejecutada';}).length;
+  document.getElementById('as-venc').textContent=D.acts.filter(venc).length;
+  var body=document.getElementById('acts-body');
+  if(!list.length){body.innerHTML='<div style="color:var(--ct);padding:2rem;text-align:center">No hay actividades</div>';return;}
+  var byC={};list.forEach(function(a){if(!byC[a.cid])byC[a.cid]=[];byC[a.cid].push(a);});
+  body.innerHTML=Object.entries(byC).map(function(entry){
+    var cid=entry[0],acts=entry[1];
+    var c=D.cls.find(function(x){return x.id===cid;})||{nombre:'Sin empresa'};
+    var ej=acts.filter(function(a){return a.estado==='Ejecutada';}).length;
+    var pct=Math.round(ej/acts.length*100);
+    return '<div class="card">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
+        '<h3>'+c.nombre+'</h3><span style="font-size:.8rem;color:var(--ct)">'+ej+'/'+acts.length+' - '+pct+'%</span></div>'+
+      '<div class="pb" style="margin-bottom:12px"><div class="pf" style="width:'+pct+'%"></div></div>'+
+      acts.map(function(a){
+        var ov=venc(a);var ef=ov?'Vencida':a.estado;
+        var bc=a.estado==='Ejecutada'?'ba':ov?'bv':a.estado==='Cancelada'?'bgr':'bpe';
+        return '<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--cs)">'+
+          '<div style="flex:1"><div style="font-weight:600;font-size:.87rem">'+a.titulo+'</div>'+
+          '<div style="font-size:.75rem;color:var(--ct)">'+a.tipo+' - '+(a.fechaP?fmtF(a.fechaP):'Sin fecha')+'</div>'+
+          (a.resultados?'<div style="font-size:.78rem;color:var(--cp);margin-top:3px">↳ '+a.resultados+'</div>':'')+
+          '</div><div style="display:flex;align-items:center;gap:6px;margin-left:8px">'+
+          '<span class="badge '+bc+'">'+ef+'</span>'+
+          '<button class="btn bs bsm" onclick="abrirAct(\''+a.cid+'\',\''+a.id+'\')">✏️</button>'+
+          '<button class="btn br bsm" onclick="eliminarAct(\''+a.id+'\')">🗑️</button>'+
+          '</div></div>';
+      }).join('')+'</div>';
+  }).join('');
+}
+function eliminarAct(id){if(!confirm('¿Eliminar?'))return;D.acts=D.acts.filter(function(x){return x.id!==id;});save();renderActs();toast('Eliminada');}
+
+// ── ENTREGABLES ────────────────────────────────
+function abrirEnt(cid,id){
+  var e=id?D.ents.find(function(x){return x.id===id;}):null;
+  document.getElementById('ent-id').value=id||'';
+  document.getElementById('m-ent-ttl').textContent=id?'Editar':'Nuevo entregable';
+  buildVMs();
+  document.getElementById('ent-cid').value=cid||(e?e.cid:'');
+  document.getElementById('ent-tipo').value=e?e.tipo||'HTML':'HTML';
+  document.getElementById('ent-nom').value=e?e.nombre||'':'';
+  document.getElementById('ent-url').value=e?e.url||'':'';
+  document.getElementById('ent-desc').value=e?e.descripcion||'':'';
+  document.getElementById('ent-prob').value=e?e.problema||'':'';
+  document.getElementById('ent-fecha').value=e?e.fecha||'':new Date().toISOString().slice(0,10);
+  document.getElementById('ent-mes').value=e?e.mes||'':'';
+  abrir('m-ent');
+}
+function guardarEnt(){
+  var cid=document.getElementById('ent-cid').value;
+  var nom=document.getElementById('ent-nom').value.trim();
+  var prob=document.getElementById('ent-prob').value.trim();
+  if(!cid||!nom||!prob){toast('Empresa, nombre y problemática son requeridos','err');return;}
+  var id=document.getElementById('ent-id').value||uid();
+  var c=D.cls.find(function(x){return x.id===cid;});
+  var obj={id:id,cid:cid,empresa:c?c.nombre:'',tipo:document.getElementById('ent-tipo').value,nombre:nom,
+    url:document.getElementById('ent-url').value.trim(),descripcion:document.getElementById('ent-desc').value,
+    problema:prob,fecha:document.getElementById('ent-fecha').value,mes:document.getElementById('ent-mes').value,creado:new Date().toISOString()};
+  var idx=D.ents.findIndex(function(x){return x.id===id;});
+  if(idx>=0)D.ents[idx]=obj;else D.ents.push(obj);
+  save();cerrar('m-ent');renderEntregables();toast('Entregable guardado');
+}
+function renderEntregables(){
+  var cid=document.getElementById('ent-filt-emp').value;
+  var list=D.ents.filter(function(e){return!cid||e.cid===cid;});
+  var body=document.getElementById('ent-body');
+  if(!list.length){body.innerHTML='<div style="color:var(--ct);padding:2rem;text-align:center">No hay entregables</div>';return;}
+  var byC={};list.forEach(function(e){if(!byC[e.cid])byC[e.cid]=[];byC[e.cid].push(e);});
+  body.innerHTML=Object.entries(byC).map(function(entry){
+    var cid=entry[0],ents=entry[1];
+    var c=D.cls.find(function(x){return x.id===cid;})||{nombre:'Sin empresa'};
+    return '<div class="card"><h3>🔗 '+c.nombre+' <span style="font-size:.78rem;color:var(--ct);font-weight:400">('+ents.length+')</span></h3>'+
+      ents.map(function(e){
+        return '<div class="ent-card">'+
+          '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
+            '<div><span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:.7rem;background:#f0ece0;color:#5a4030;margin-bottom:4px">'+e.tipo+'</span>'+
+            '<div style="font-weight:600;font-size:.9rem">'+e.nombre+'</div></div>'+
+            '<div style="display:flex;gap:6px">'+
+              '<button class="btn bs bsm" onclick="abrirEnt(\''+e.cid+'\',\''+e.id+'\')">✏️</button>'+
+              '<button class="btn br bsm" onclick="eliminarEnt(\''+e.id+'\')">🗑️</button>'+
+            '</div></div>'+
+          (e.url?'<div style="margin:6px 0"><a href="'+e.url+'" target="_blank" style="font-size:.82rem">🔗 '+e.url+'</a></div>':'')+
+          '<div style="font-size:.82rem;padding:6px 10px;background:#fef9f0;border-radius:6px;border-left:3px solid #8a6940;margin-top:6px">'+
+            '<strong>✅ Solucionó:</strong> '+e.problema+'</div>'+
+          '<div style="font-size:.72rem;color:var(--ct);margin-top:4px">'+(e.mes||'')+' - '+fmtF(e.fecha)+'</div>'+
+        '</div>';
+      }).join('')+'</div>';
+  }).join('');
+}
+function eliminarEnt(id){if(!confirm('¿Eliminar?'))return;D.ents=D.ents.filter(function(x){return x.id!==id;});save();renderEntregables();toast('Eliminado');}
+
+// ── KPIs ───────────────────────────────────────
+var _kLecturas=[];
+var _kRels=[];
+function abrirKPI(id,cid){
+  var k=id?D.kpis.find(function(x){return x.id===id;}):null;
+  document.getElementById('kpi-id').value=k?k.id:'';
+  document.getElementById('m-kpi-ttl').textContent=k?'Editar KPI':'Nuevo KPI';
+  buildVMs();
+  document.getElementById('kpi-cid').value=cid||(k?k.cid:'');
+  document.getElementById('kpi-nom').value=k?k.nombre||'':'';
+  document.getElementById('kpi-uni').value=k?k.unidad||'':'';
+  document.getElementById('kpi-meta').value=k?k.meta||'':'';
+  document.getElementById('kpi-cat').value=k?k.categoria||'Ventas':'Ventas';
+  document.getElementById('kpi-cat').onchange=function(){
+    var sec=document.getElementById('kpi-cruzado-sec');
+    sec.style.display=this.value==='KPI Cruzado'?'block':'none';
+    if(this.value==='KPI Cruzado'){
+      var opts='<option value="">Selecciona...</option>'+D.kpis.filter(function(x){return x.id!==document.getElementById('kpi-id').value;}).map(function(k){return '<option value="'+k.id+'">'+k.nombre+'</option>';}).join('');
+      document.getElementById('kpi-cruz-num').innerHTML=opts;
+      document.getElementById('kpi-cruz-den').innerHTML=opts;
+    }
+  };
+  if(k&&k.categoria==='KPI Cruzado'){
+    (function(){var _s=document.getElementById('kpi-cruzado-sec');if(_s)_s.style.display='block';})();;
+    var opts2='<option value="">Selecciona...</option>'+D.kpis.filter(function(x){return x.id!==k.id;}).map(function(ki){return '<option value="'+ki.id+'"'+(ki.id===k.cruzNum?' selected':'')+'>'+ki.nombre+'</option>';}).join('');
+    var opts3='<option value="">Selecciona...</option>'+D.kpis.filter(function(x){return x.id!==k.id;}).map(function(ki){return '<option value="'+ki.id+'"'+(ki.id===k.cruzDen?' selected':'')+'>'+ki.nombre+'</option>';}).join('');
+    document.getElementById('kpi-cruz-num').innerHTML=opts2;
+    document.getElementById('kpi-cruz-den').innerHTML=opts3;
+    document.getElementById('kpi-cruz-label').value=k.cruzLabel||'';
+  } else {
+    (function(){var _s=document.getElementById('kpi-cruzado-sec');if(_s)_s.style.display='none';})();;
+  }
+  document.getElementById('kpi-desc').value=k?k.descripcion||'':'';
+  _kLecturas=k?JSON.parse(JSON.stringify(k.lecturas||[])):[]; 
+  _kRels=k?JSON.parse(JSON.stringify(k.relacionados||[])):[];
+  renderKLecturas();renderKRels();
+  document.getElementById('kl-mes').value='';
+  document.getElementById('kl-ant').value='';
+  document.getElementById('kl-act').value='';
+  document.getElementById('kl-obs').value='';
+  abrir('m-kpi');
+}
+function renderKRels(){
+  var div=document.getElementById('kpi-rel-list');
+  div.innerHTML=_kRels.map(function(rid){
+    var k=D.kpis.find(function(x){return x.id===rid;});
+    return k?'<span class="kpi-tag">'+k.nombre+' <button onclick="quitarRel(\''+rid+'\')" style="background:none;border:none;cursor:pointer;font-size:.75rem">✕</button></span>':'';
+  }).join('');
+  var sel=document.getElementById('kpi-rel-sel');
+  if(sel){sel.onchange=function(){if(this.value&&!_kRels.includes(this.value)){_kRels.push(this.value);renderKRels();}this.value='';};}
+}
+function quitarRel(rid){_kRels=_kRels.filter(function(r){return r!==rid;});renderKRels();}
+function agregarLectura(){
+  var mes=document.getElementById('kl-mes').value.trim();
+  var ant=parseFloat(document.getElementById('kl-ant').value)||0;
+  var act=parseFloat(document.getElementById('kl-act').value)||0;
+  if(!mes){toast('Ingresa el mes','err');return;}
+  // Check if mes already exists - update it
+  var idx=_kLecturas.findIndex(function(l){return l.mes===mes;});
+  var lec={mes:mes,anterior:ant,actual:act,cambio:ant?Math.round((act-ant)/ant*100):0,obs:document.getElementById('kl-obs').value};
+  if(idx>=0)_kLecturas[idx]=lec;else _kLecturas.push(lec);
+  renderKLecturas();
+  document.getElementById('kl-mes').value='';document.getElementById('kl-ant').value='';
+  document.getElementById('kl-act').value='';document.getElementById('kl-obs').value='';
+}
+function editarLectura(idx){
+  var l=_kLecturas[idx];
+  document.getElementById('kl-mes').value=l.mes;
+  document.getElementById('kl-ant').value=l.anterior;
+  document.getElementById('kl-act').value=l.actual;
+  document.getElementById('kl-obs').value=l.obs||'';
+  _kLecturas.splice(idx,1);
+  renderKLecturas();
+}
+function renderKLecturas(){
+  var div=document.getElementById('kpi-lec-list');
+  if(!_kLecturas.length){div.innerHTML='';return;}
+  div.innerHTML='<div class="tw"><table class="tbl"><thead><tr><th>Mes</th><th>Sin RUMONT</th><th>Con RUMONT</th><th>Cambio</th><th>Obs.</th><th></th></tr></thead><tbody>'+
+    _kLecturas.map(function(l,i){
+      return '<tr><td>'+l.mes+'</td><td>'+l.anterior+'</td><td>'+l.actual+'</td>'+
+        '<td style="color:'+(l.cambio>=0?'green':'red')+'">'+(l.cambio>=0?'+':'')+l.cambio+'%</td>'+
+        '<td style="font-size:.75rem;max-width:120px">'+(l.obs||'—')+'</td>'+
+        '<td style="display:flex;gap:4px">'+
+          '<button class="btn bs bsm" onclick="editarLectura('+i+')">✏️</button>'+
+          '<button class="btn br bsm" onclick="_kLecturas.splice('+i+',1);renderKLecturas()">✕</button>'+
+        '</td></tr>';
+    }).join('')+'</tbody></table></div>';
+}
+function guardarKPI(){
+  var cid=document.getElementById('kpi-cid').value;
+  var nom=document.getElementById('kpi-nom').value.trim();
+  if(!cid){toast('Selecciona empresa','err');return;}
+  if(!nom){toast('Nombre requerido','err');return;}
+  var id=document.getElementById('kpi-id').value||uid();
+  var cat=document.getElementById('kpi-cat').value;
+  var obj={id:id,cid:cid,nombre:nom,unidad:document.getElementById('kpi-uni').value,
+    meta:document.getElementById('kpi-meta').value,categoria:cat,
+    descripcion:document.getElementById('kpi-desc').value,lecturas:_kLecturas,relacionados:_kRels,
+    cruzNum:cat==='KPI Cruzado'?document.getElementById('kpi-cruz-num').value:'',
+    cruzDen:cat==='KPI Cruzado'?document.getElementById('kpi-cruz-den').value:'',
+    cruzLabel:cat==='KPI Cruzado'?document.getElementById('kpi-cruz-label').value:'',
+    creado:new Date().toISOString()};
+  // Auto-calculate cruzado lecturas
+  if(cat==='KPI Cruzado'&&obj.cruzNum&&obj.cruzDen){
+    var kNum=D.kpis.find(function(x){return x.id===obj.cruzNum;});
+    var kDen=D.kpis.find(function(x){return x.id===obj.cruzDen;});
+    if(kNum&&kDen&&kNum.lecturas&&kDen.lecturas){
+      obj.lecturas=kNum.lecturas.map(function(ln){
+        var ld=kDen.lecturas.find(function(l){return l.mes===ln.mes;});
+        if(!ld||!ld.actual||!ln.actual)return null;
+        var antR=ld.anterior?Math.round(ln.anterior/ld.anterior):0;
+        var actR=Math.round(ln.actual/ld.actual);
+        var cambio=antR?Math.round((actR-antR)/antR*100):0;
+        return{mes:ln.mes,anterior:antR,actual:actR,cambio:cambio,obs:'Auto: '+kNum.nombre+' / '+kDen.nombre};
+      }).filter(Boolean);
+    }
+  }
+  var idx=D.kpis.findIndex(function(x){return x.id===id;});
+  if(idx>=0)D.kpis[idx]=obj;else D.kpis.push(obj);
+  save();cerrar('m-kpi');renderKPIs();toast('KPI guardado');
+}
+function abrirKPINuevo(cid){
+  _kLecturas=[];_kRels=[];
+  document.getElementById('kpi-id').value='';
+  document.getElementById('m-kpi-ttl').textContent='Nuevo KPI';
+  buildVMs();
+  if(cid)document.getElementById('kpi-cid').value=cid;
+  document.getElementById('kpi-nom').value='';
+  document.getElementById('kpi-uni').value='';
+  document.getElementById('kpi-meta').value='';
+  document.getElementById('kpi-cat').value='Ventas';
+  document.getElementById('kpi-desc').value='';
+  var csec=document.getElementById('kpi-cruzado-sec');if(csec)csec.style.display='none';
+  renderKLecturas();renderKRels();
+  document.getElementById('kl-mes').value='';
+  document.getElementById('kl-ant').value='';
+  document.getElementById('kl-act').value='';
+  document.getElementById('kl-obs').value='';
+  abrir('m-kpi');
+}
+function abrirKPIById(id){
+  var k=D.kpis.find(function(x){return x.id===id;});
+  if(!k){toast('KPI no encontrado','err');return;}
+  _kLecturas=JSON.parse(JSON.stringify(k.lecturas||[]));
+  _kRels=JSON.parse(JSON.stringify(k.relacionados||[]));
+  document.getElementById('kpi-id').value=k.id;
+  document.getElementById('m-kpi-ttl').textContent='Editar KPI';
+  buildVMs();
+  document.getElementById('kpi-cid').value=k.cid;
+  document.getElementById('kpi-nom').value=k.nombre||'';
+  document.getElementById('kpi-uni').value=k.unidad||'';
+  document.getElementById('kpi-meta').value=k.meta||'';
+  document.getElementById('kpi-cat').value=k.categoria||'Ventas';
+  document.getElementById('kpi-desc').value=k.descripcion||'';
+  renderKLecturas();renderKRels();
+  document.getElementById('kl-mes').value='';
+  document.getElementById('kl-ant').value='';
+  document.getElementById('kl-act').value='';
+  document.getElementById('kl-obs').value='';
+  if(k.categoria==='KPI Cruzado'){
+    (function(){var _s=document.getElementById('kpi-cruzado-sec');if(_s)_s.style.display='block';})();;
+    var opts='<option value="">Selecciona...</option>'+D.kpis.filter(function(x){return x.id!==k.id;}).map(function(ki){return '<option value="'+ki.id+'"'+(ki.id===k.cruzNum?' selected':'')+'>'+ki.nombre+'</option>';}).join('');
+    var opts2='<option value="">Selecciona...</option>'+D.kpis.filter(function(x){return x.id!==k.id;}).map(function(ki){return '<option value="'+ki.id+'"'+(ki.id===k.cruzDen?' selected':'')+'>'+ki.nombre+'</option>';}).join('');
+    document.getElementById('kpi-cruz-num').innerHTML=opts;
+    document.getElementById('kpi-cruz-den').innerHTML=opts2;
+    document.getElementById('kpi-cruz-label').value=k.cruzLabel||'';
+  } else {
+    (function(){var _s=document.getElementById('kpi-cruzado-sec');if(_s)_s.style.display='none';})();;
+  }
+  abrir('m-kpi');
+}
+function renderKPIs(){
+  window._kpiReg={}; // registry: index -> kpi id
+  var cid=document.getElementById('kpi-filt').value;
+  var cls=cid?D.cls.filter(function(c){return c.id===cid;}):D.cls;
+  var body=document.getElementById('kpis-body');
+  if(!cls.length){body.innerHTML='<div style="color:var(--ct);padding:2rem">No hay empresas</div>';return;}
+  var html='';
+  var reg={};
+  var idx=0;
+  cls.forEach(function(c){
+    var kpis=D.kpis.filter(function(k){return k.cid===c.id;});
+    html+='<div class="card">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">';
+    html+='<h3>'+c.nombre+'</h3>';
+    var _cidx=idx; html+='<button class="btn bp bsm" onclick="window._newKPI('+_cidx+')">+ Nuevo KPI</button>';
+    html+='</div>';
+    if(!kpis.length){html+='<div style="color:var(--ct);font-size:.85rem">Sin KPIs configurados</div>';}
+    kpis.forEach(function(k){
+      reg[idx]=k.id;
+      var last=k.lecturas&&k.lecturas.length?k.lecturas[k.lecturas.length-1]:null;
+      var pct=last&&k.meta?Math.min(100,Math.round(last.actual/parseFloat(k.meta)*100)):0;
+      var rels=k.relacionados&&k.relacionados.length?k.relacionados.map(function(rid){
+        var kr=D.kpis.find(function(x){return x.id===rid;});
+        return kr?'<span class="kpi-tag">🔗 '+kr.nombre+'</span>':'';
+      }).join(''):'';
+      var cruzInfo='';
+      if(k.categoria==='KPI Cruzado'&&k.cruzNum&&k.cruzDen){
+        var kN=D.kpis.find(function(x){return x.id===k.cruzNum;});
+        var kD=D.kpis.find(function(x){return x.id===k.cruzDen;});
+        cruzInfo='<div style="background:#e8f0d8;border-radius:6px;padding:8px 12px;margin-bottom:8px;font-size:.8rem">'+
+          '⚡ <strong>KPI Cruzado:</strong> '+(kN?kN.nombre:'?')+' ÷ '+(kD?kD.nombre:'?')+
+          (k.cruzLabel?' = <em>'+k.cruzLabel+'</em>':'')+
+          ' <button class="btn bs bsm" onclick="recalcularCruzado(this.dataset.kid)" data-kid="'+k.id+'" style="margin-left:8px">🔄 Recalcular</button>'+
+        '</div>';
+      }
+      html+='<div class="kpi-blk">';
+      html+='<div class="kpi-blk-hdr">';
+      html+='<div>';
+      html+='<span style="font-size:.7rem;background:#e8f0d8;color:var(--cp);padding:2px 8px;border-radius:10px;margin-right:6px">'+k.categoria+'</span>';
+      html+='<strong style="font-size:.9rem">'+k.nombre+'</strong>';
+      html+=(k.unidad?' <span style="font-size:.75rem;color:var(--ct)">('+k.unidad+')</span>':'');
+      html+='</div>';
+      html+='<div style="display:flex;gap:6px">';
+      html+='<button class="btn bs bsm" onclick="window._editKPI('+idx+')">✏️ Editar</button>';
+      html+='<button class="btn br bsm" onclick="window._delKPI('+idx+')">🗑️</button>';
+      html+='</div>';
+      html+='</div>';
+      if(rels)html+='<div style="margin-bottom:8px">'+rels+'</div>';
+      html+=cruzInfo;
+      if(last){
+        html+='<div style="display:flex;gap:20px;margin-bottom:8px;flex-wrap:wrap">';
+        html+='<div><div style="font-size:1.3rem;font-weight:700;color:var(--cp)">'+fmtKPI(last.actual,k.unidad)+'</div><div style="font-size:.7rem;color:var(--ct)">Con RUMONT</div></div>';
+        html+='<div><div style="font-size:1.3rem;font-weight:700">'+fmtKPI(last.anterior,k.unidad)+'</div><div style="font-size:.7rem;color:var(--ct)">Sin RUMONT</div></div>';
+        html+='<div><div style="font-size:1.3rem;font-weight:700;color:'+(last.cambio>=0?'#2d6a2d':'var(--cr)')+'">'+( last.cambio>=0?'+':'')+last.cambio+'%</div><div style="font-size:.7rem;color:var(--ct)">Variación</div></div>';
+        if(k.meta)html+='<div><div style="font-size:1.3rem;font-weight:700;color:var(--ca)">'+pct+'%</div><div style="font-size:.7rem;color:var(--ct)">Avance meta</div></div>';
+        html+='</div>';
+        html+='<div class="pb"><div class="pf" style="width:'+pct+'%"></div></div>';
+      }
+      if(k.lecturas&&k.lecturas.length){
+        html+='<div class="tw" style="margin-top:10px"><table class="tbl"><thead><tr><th>Mes</th><th>Sin RUMONT</th><th>Con RUMONT</th><th>Cambio</th><th>Observaciones</th></tr></thead><tbody>';
+        k.lecturas.slice().reverse().forEach(function(l){
+          html+='<tr><td>'+l.mes+'</td><td>'+fmtKPI(l.anterior,k.unidad)+'</td><td>'+fmtKPI(l.actual,k.unidad)+'</td>';
+          html+='<td style="color:'+(l.cambio>=0?'green':'red')+'">'+(l.cambio>=0?'+':'')+l.cambio+'%</td>';
+          html+='<td style="font-size:.75rem">'+(l.obs||'—')+'</td></tr>';
+        });
+        html+='</tbody></table></div>';
+      }
+      html+='</div>';
+      idx++;
+    });
+    html+='</div>';
+  });
+  body.innerHTML=html;
+  window._kpiReg=reg;
+  // Attach click handlers using registry
+  window._newKPI=function(i){
+    // find cid for this button
+    var allCls=document.getElementById('kpi-filt').value?
+      D.cls.filter(function(c){return c.id===document.getElementById('kpi-filt').value;}):D.cls;
+    var idx2=0;
+    for(var ci=0;ci<allCls.length;ci++){
+      var kpis2=D.kpis.filter(function(k){return k.cid===allCls[ci].id;});
+      if(i>=idx2&&i<=idx2+kpis2.length){
+        abrirKPINuevo(allCls[ci].id);return;
+      }
+      idx2+=kpis2.length;
+    }
+    abrirKPINuevo('');
+  };
+  window._editKPI=function(i){
+    var kid=window._kpiReg[i];
+    if(kid)abrirKPIById(kid);
+  };
+  window._delKPI=function(i){
+    var kid=window._kpiReg[i];
+    if(kid&&confirm('¿Eliminar este KPI?'))eliminarKPI(kid);
+  };
+}
+function eliminarKPI(id){if(!confirm('¿Eliminar KPI?'))return;D.kpis=D.kpis.filter(function(x){return x.id!==id;});save();renderKPIs();toast('KPI eliminado');}
+
+// ── GASTOS ─────────────────────────────────────
+function abrirGasto(id){
+  var g=id?D.gastos.find(function(x){return x.id===id;}):null;
+  document.getElementById('gas-id').value=id||'';
+  document.getElementById('gas-cat').value=g?g.categoria:'Membresía/Suscripción';
+  document.getElementById('gas-desc').value=g?g.descripcion||'':'';
+  document.getElementById('gas-val').value=g?g.valor||'':'';
+  document.getElementById('gas-mes').value=g?g.mes||'':'';
+  document.getElementById('gas-fecha').value=g?g.fecha:new Date().toISOString().slice(0,10);
+  document.getElementById('gas-tipo').value=g?g.tipo||'Fijo':'Fijo';
+  document.getElementById('gas-notas').value=g?g.notas||'':'';
+  abrir('m-gasto');
+}
+function guardarGasto(){
+  var desc=document.getElementById('gas-desc').value.trim();
+  var val=parseFloat(document.getElementById('gas-val').value)||0;
+  if(!desc||!val){toast('Descripción y valor requeridos','err');return;}
+  var id=document.getElementById('gas-id').value||uid();
+  var obj={id:id,categoria:document.getElementById('gas-cat').value,descripcion:desc,valor:val,
+    mes:document.getElementById('gas-mes').value,fecha:document.getElementById('gas-fecha').value,
+    tipo:document.getElementById('gas-tipo').value,notas:document.getElementById('gas-notas').value,creado:new Date().toISOString()};
+  var idx=D.gastos.findIndex(function(x){return x.id===id;});
+  if(idx>=0)D.gastos[idx]=obj;else D.gastos.push(obj);
+  save();cerrar('m-gasto');renderGastos();toast('Gasto guardado');
+}
+function exportGastosExcel(){
+  var data=D.gastos.map(function(g){return{'Mes':g.mes,'Categoría':g.categoria,'Descripción':g.descripcion,'Tipo':g.tipo,'Valor':g.valor,'Fecha':fmtF(g.fecha)};});
+  if(!data.length){toast('Sin datos','err');return;}
+  var ws=XLSX.utils.json_to_sheet(data);var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Gastos');
+  XLSX.writeFile(wb,'RUMONT-Gastos.xlsx');toast('Excel descargado ✓');
+}
+function renderGastos(){
+  var fmes=document.getElementById('gas-filt-mes').value;
+  var meses=[];D.gastos.forEach(function(g){if(g.mes&&!meses.includes(g.mes))meses.push(g.mes);});meses.sort().reverse();
+  var sel=document.getElementById('gas-filt-mes');var cur=sel.value;
+  sel.innerHTML='<option value="">Todos los meses</option>'+meses.map(function(m){return '<option'+(m===cur?' selected':'')+'>'+m+'</option>';}).join('');
+  var list=D.gastos.filter(function(g){return!fmes||g.mes===fmes;});
+  document.getElementById('gas-tot').textContent=fmt(D.gastos.reduce(function(s,g){return s+g.valor;},0));
+  document.getElementById('gas-fij').textContent=fmt(D.gastos.filter(function(g){return g.tipo&&g.tipo.includes('Fijo');}).reduce(function(s,g){return s+g.valor;},0));
+  document.getElementById('gas-var').textContent=fmt(D.gastos.filter(function(g){return !g.tipo||g.tipo==='Variable';}).reduce(function(s,g){return s+g.valor;},0));
+  var body=document.getElementById('gas-body');
+  if(!list.length){body.innerHTML='<div style="color:var(--ct);padding:2rem;text-align:center">No hay gastos</div>';return;}
+  var cats={};list.forEach(function(g){if(!cats[g.categoria])cats[g.categoria]=[];cats[g.categoria].push(g);});
+  body.innerHTML=Object.entries(cats).map(function(entry){
+    var cat=entry[0],gs=entry[1];
+    var tot=gs.reduce(function(s,g){return s+g.valor;},0);
+    return '<div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><h3>'+cat+'</h3><strong style="color:var(--cp)">'+fmt(tot)+'</strong></div>'+
+      '<table class="tbl"><thead><tr><th>Descripción</th><th>Tipo</th><th>Mes</th><th>Valor</th><th></th></tr></thead><tbody>'+
+      gs.map(function(g){
+        return '<tr><td>'+g.descripcion+'</td><td><span class="badge '+(g.tipo==='Fijo'?'ba':'bpe')+'">'+g.tipo+'</span></td><td>'+(g.mes||'—')+'</td><td>'+fmt(g.valor)+'</td>'+
+          '<td><button class="btn bs bsm" onclick="abrirGasto(\''+g.id+'\')">✏️</button> <button class="btn br bsm" onclick="eliminarGasto(\''+g.id+'\')">🗑️</button></td></tr>';
+      }).join('')+'</tbody></table></div>';
+  }).join('');
+}
+function eliminarGasto(id){if(!confirm('¿Eliminar?'))return;D.gastos=D.gastos.filter(function(x){return x.id!==id;});save();renderGastos();toast('Eliminado');}
+
+// ── TALENTOS ────────────────────────────────────
+function copiarLinkTalento(){
+  var link='https://rumontco-a11y.github.io/rumont-360/RUMONT-Talentos-Publico.html';
+  navigator.clipboard.writeText(link).then(function(){toast('¡Link copiado! Compártelo con los empleados ✓');}).catch(function(){toast('Link: '+link);});
+}
+function abrirTalento(id){
+  var t=id?D.talentos.find(function(x){return x.id===id;}):null;
+  document.getElementById('tal-id').value=id||'';
+  document.getElementById('m-tal-ttl').textContent=id?'Editar talento':'Registrar talento';
+  ['nom','ced','cargo','emp','tel','email','ciu','est','exp','cap','notas'].forEach(function(f){document.getElementById('tal-'+f).value=t?t[f]||'':'';});
+  document.getElementById('tal-nac').value=t?t.nac||'':'';
+  document.getElementById('tal-disp').value=t?t.disponibilidad||'Sí':'Sí';
+  abrir('m-talento');
+}
+function guardarTalento(){
+  var nom=document.getElementById('tal-nom').value.trim();
+  var ced=document.getElementById('tal-ced').value.trim();
+  if(!nom||!ced){toast('Nombre y cédula requeridos','err');return;}
+  var id=document.getElementById('tal-id').value||uid();
+  var obj={id:id,nom:nom,ced:ced,cargo:document.getElementById('tal-cargo').value,emp:document.getElementById('tal-emp').value,
+    tel:document.getElementById('tal-tel').value,email:document.getElementById('tal-email').value,
+    ciu:document.getElementById('tal-ciu').value,nac:document.getElementById('tal-nac').value,
+    est:document.getElementById('tal-est').value,exp:document.getElementById('tal-exp').value,
+    cap:document.getElementById('tal-cap').value,disponibilidad:document.getElementById('tal-disp').value,
+    notas:document.getElementById('tal-notas').value,creado:new Date().toISOString()};
+  var idx=D.talentos.findIndex(function(x){return x.id===id;});
+  if(idx>=0)D.talentos[idx]=obj;else D.talentos.push(obj);
+  save();cerrar('m-talento');renderTalentos();toast('Talento guardado');
+}
+function exportTalentosExcel(){
+  var data=D.talentos.map(function(t){return{'Nombre':t.nom,'Cédula':t.ced,'Cargo':t.cargo,'Empresa':t.emp,'Teléfono':t.tel,'Email':t.email,'Ciudad':t.ciu,'Fecha Nac.':fmtF(t.nac),'Estudios':t.est,'Experiencia':t.exp,'Cap. RUMONT':t.cap,'Disponibilidad':t.disponibilidad};});
+  if(!data.length){toast('Sin datos','err');return;}
+  var ws=XLSX.utils.json_to_sheet(data);var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Talentos');
+  XLSX.writeFile(wb,'RUMONT-Talentos.xlsx');toast('Excel descargado ✓');
+}
+function renderTalentos(){
+  var q=document.getElementById('tal-q').value.toLowerCase();
+  var mesAct=new Date().getMonth()+1;
+  var list=D.talentos.filter(function(t){return!q||(t.nom||'').toLowerCase().includes(q)||(t.cargo||'').toLowerCase().includes(q)||(t.emp||'').toLowerCase().includes(q);});
+  var emps=new Set(D.talentos.map(function(t){return t.emp;}).filter(Boolean)).size;
+  var cum=D.talentos.filter(function(t){return t.nac&&parseInt(t.nac.split('-')[1])===mesAct;}).length;
+  document.getElementById('tal-tot').textContent=D.talentos.length;
+  document.getElementById('tal-emp-tot').textContent=emps;
+  document.getElementById('tal-cum').textContent=cum;
+  var body=document.getElementById('tal-body');
+  if(!list.length){body.innerHTML='<div style="color:var(--ct);padding:2rem;grid-column:1/-1">No hay talentos registrados.<br><br><button class="btn bp" onclick="abrirTalento()">+ Registrar primer talento</button></div>';return;}
+  body.innerHTML=list.map(function(t){
+    var dc=t.disponibilidad==='Sí'?'ba':t.disponibilidad==='No'?'bgr':'bpe';
+    var esCum=t.nac&&parseInt(t.nac.split('-')[1])===mesAct;
+    return '<div class="tal-card">'+
+      (esCum?'<div style="font-size:.8rem;margin-bottom:4px">🎂 ¡Cumpleaños este mes!</div>':'')+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
+        '<div><h4 style="font-size:.95rem;margin-bottom:2px">'+t.nom+'</h4>'+
+        '<div style="font-size:.75rem;color:var(--ct)">'+(t.cargo||'—')+' - '+(t.emp||'Sin empresa')+'</div></div>'+
+        '<span class="badge '+dc+'" style="font-size:.65rem">'+(t.disponibilidad==='Sí'?'🟢':t.disponibilidad==='No'?'🔴':'🟡')+' '+t.disponibilidad+'</span>'+
+      '</div>'+
+      '<div style="font-size:.75rem;margin:8px 0;color:var(--ct)">'+
+        (t.tel?'📞 '+t.tel:'')+(t.email?' · ✉️ '+t.email:'')+
+        (t.ciu?'<br>📍 '+t.ciu:'')+(t.nac?'<br>🎂 '+fmtF(t.nac):'')+
+      '</div>'+
+      (t.est?'<div style="font-size:.78rem;margin-bottom:4px"><strong>Estudios:</strong> '+t.est+'</div>':'')+
+      (t.cap?'<div style="font-size:.78rem;padding:6px;background:#f0f4e8;border-radius:6px;margin-bottom:6px"><strong>✅ Cap. RUMONT:</strong> '+t.cap+'</div>':'')+
+      '<div style="display:flex;gap:6px;margin-top:8px">'+
+        '<button class="btn bs bsm" onclick="abrirTalento(\''+t.id+'\')">✏️</button>'+
+        '<button class="btn br bsm" onclick="eliminarTalento(\''+t.id+'\')">🗑️</button>'+
+      '</div></div>';
+  }).join('');
+}
+function eliminarTalento(id){if(!confirm('¿Eliminar?'))return;D.talentos=D.talentos.filter(function(x){return x.id!==id;});save();renderTalentos();toast('Eliminado');}
+
+// ── INFORME CON GRÁFICAS ───────────────────────
+var _charts=[];
+function destruirCharts(){_charts.forEach(function(c){try{c.destroy();}catch(e){}});_charts=[];}
+function generarInforme(){
+  destruirCharts();
+  var showGrafica=document.getElementById('inf-show-grafica').checked;
+  var showEjec=document.getElementById('inf-show-ejec').checked;
+  var showPend=document.getElementById('inf-show-pend').checked;
+  var showEnt=document.getElementById('inf-show-ent').checked;
+  var showKpi=document.getElementById('inf-show-kpi').checked;
+  var showCobros=document.getElementById('inf-show-cobros').checked;
+  var hideCifras=document.getElementById('inf-show-stats').checked;
+  var cid=document.getElementById('inf-emp').value;
+  var cls=cid?D.cls.filter(function(x){return x.id===cid;}):D.cls;
+  var body=document.getElementById('inf-body');
+  if(!cls.length){body.innerHTML='<div style="color:var(--ct);padding:2rem">No hay empresas</div>';return;}
+
+  var totalFact=D.ccs.reduce(function(s,x){return s+x.valor;},0);
+  var totalPag=D.ccs.filter(function(x){return x.pagado;}).reduce(function(s,x){return s+x.valor;},0);
+  var totalActs=D.acts.length;
+  var totalEjec=D.acts.filter(function(a){return a.estado==='Ejecutada';}).length;
+
+  // LOGO HEADER for print
+  var logoHdr='<div class="inf-logo-hdr no-screen" style="display:none;text-align:center;padding:20px 0 30px;border-bottom:3px solid #5a6940;margin-bottom:24px">'+
+    '<div style="font-size:2.5rem;font-weight:300;letter-spacing:8px;color:#5a6940">RUMONT</div>'+
+    '<div style="font-size:.8rem;letter-spacing:4px;color:#888;margin-top:4px">MENTORÍAS COMERCIALES · 360°</div>'+
+    '<div style="font-size:.85rem;color:#555;margin-top:8px">Informe de Resultados · '+new Date().toLocaleDateString('es-CO',{year:'numeric',month:'long',day:'numeric'})+'</div>'+
+  '</div>';
+
+  var globalHtml='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">'+
+    '<div class="sc"><div class="sv" style="font-size:1rem">'+fmt(totalFact)+'</div><div class="sl">Total facturado</div></div>'+
+    '<div class="sc"><div class="sv" style="font-size:1rem">'+fmt(totalPag)+'</div><div class="sl">Total recibido</div></div>'+
+    '<div class="sc"><div class="sv">'+totalEjec+'/'+totalActs+'</div><div class="sl">Actividades ejecutadas</div></div>'+
+    '<div class="sc"><div class="sv">'+cls.length+'</div><div class="sl">Empresas en informe</div></div>'+
+  '</div>';
+
+  var empHtml=cls.map(function(c,ci){
+    var ccs=D.ccs.filter(function(x){return x.cid===c.id;});
+    var acts=D.acts.filter(function(x){return x.cid===c.id;});
+    var ents=D.ents.filter(function(x){return x.cid===c.id;});
+    var kpis=D.kpis.filter(function(k){return k.cid===c.id;});
+    var ejec=acts.filter(function(x){return x.estado==='Ejecutada';});
+    var pend=acts.filter(function(x){return x.estado==='Pendiente';});
+    var vencidas=acts.filter(venc);
+    var facturado=ccs.reduce(function(s,x){return s+x.valor;},0);
+    var pagado=ccs.filter(function(x){return x.pagado;}).reduce(function(s,x){return s+x.valor;},0);
+    var invRUMONT=facturado; // Solo la inversión en mentoría
+    var pct=acts.length?Math.round(ejec.length/acts.length*100):0;
+    var actChId='act-ch-'+c.id+'-'+ci;
+    var kpiChId='kpi-ch-'+c.id+'-'+ci;
+    var dualChId='dual-ch-'+c.id+'-'+ci;
+
+    // Find KPIs for dual chart (ventas + ocupación)
+    var kpiVentas=kpis.find(function(k){return k.categoria==='Ventas'||k.nombre.toLowerCase().includes('factur')||k.nombre.toLowerCase().includes('venta');});
+    var kpiOcup=kpis.find(function(k){return k.categoria==='Ocupación'||k.nombre.toLowerCase().includes('ocup');});
+    var kpiCruz=kpis.find(function(k){return k.categoria==='KPI Cruzado';});
+
+    return '<div class="inf-empresa">'+
+      // Header empresa
+      '<div class="inf-emp-hdr">'+
+        '<div>'+
+          '<h2 style="font-size:1.3rem;color:var(--cp);margin-bottom:4px">'+c.nombre+'</h2>'+
+          '<div style="font-size:.82rem;color:var(--ct)">'+(c.sector||'')+(c.ciudad?' · '+c.ciudad:'')+(c.nit?' · NIT: '+c.nit:'')+'</div>'+
+          '<div style="font-size:.82rem;color:var(--ct)">Período: '+fmtF(c.inicio)+' → '+fmtF(c.fin)+' · Contacto: '+(c.contacto||'—')+(c.tel?' · '+c.tel:'')+'</div>'+
+          '<div style="font-size:.82rem;color:var(--cp);font-weight:600;margin-top:4px">Inversión en mentoría RUMONT: '+fmtNum(invRUMONT,c.moneda||'COP')+'</div>'+
+        '</div>'+
+        '<span class="badge '+(c.estado==='Activo'?'ba':'bgr')+'">'+c.estado+'</span>'+
+      '</div>'+
+
+      // Stats
+      (!hideCifras&&showCobros?'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">'+
+        '<div class="sc"><div class="sv" style="font-size:1rem">'+fmtNum(facturado,c.moneda)+'</div><div class="sl">Facturado</div></div>'+
+        '<div class="sc"><div class="sv" style="font-size:1rem">'+fmtNum(pagado,c.moneda)+'</div><div class="sl">Pagado</div></div>'+
+        '<div class="sc"><div class="sv">'+ejec.length+'/'+acts.length+'</div><div class="sl">Actividades</div></div>'+
+        '<div class="sc"><div class="sv" style="color:var(--ca)">'+pct+'%</div><div class="sl">Avance</div></div>'+
+      '</div>':'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">'+
+        '<div class="sc"><div class="sv">'+ejec.length+'/'+acts.length+'</div><div class="sl">Actividades ejecutadas</div></div>'+
+        '<div class="sc"><div class="sv" style="color:var(--ca)">'+pct+'%</div><div class="sl">Avance general</div></div>'+
+      '</div>')+
+
+      // GRÁFICAS
+      (showGrafica&&kpiVentas&&kpiOcup&&kpiVentas.lecturas&&kpiOcup.lecturas&&kpiVentas.lecturas.length?
+        '<div class="card" style="margin-bottom:16px">'+
+          '<h3 style="margin-bottom:12px">📊 '+kpiVentas.nombre+' vs '+kpiOcup.nombre+' — Impacto RUMONT</h3>'+
+          '<div class="chart-wrap" style="height:280px"><canvas id="'+dualChId+'"></canvas></div>'+
+          (kpiCruz&&kpiCruz.lecturas&&kpiCruz.lecturas.length?
+            '<div style="background:#e8f4e8;border-radius:8px;padding:12px;margin-top:12px;font-size:.85rem">'+
+            '⚡ <strong>Impacto real ajustado ('+kpiCruz.nombre+'):</strong> '+
+            kpiCruz.lecturas.map(function(l){return l.mes+': '+fmtKPI(l.actual,kpiCruz.unidad)+(l.cambio?' ('+(l.cambio>=0?'+':'')+l.cambio+'%)':'');}).join(' → ')+
+          '</div>':'')+'</div>'
+      :
+        '<div class="grid2" style="margin-bottom:16px">'+
+          '<div class="card"><h3>Estado de actividades</h3><div class="chart-wrap" style="height:200px"><canvas id="'+actChId+'"></canvas></div></div>'+
+          (kpis.length&&kpis[0].lecturas&&kpis[0].lecturas.length?
+            '<div class="card"><h3>📈 '+kpis[0].nombre+'</h3><div class="chart-wrap" style="height:200px"><canvas id="'+kpiChId+'"></canvas></div></div>'
+          :'<div></div>')+
+        '</div>'
+      )+
+
+      // ACTIVIDADES
+      (showEjec&&ejec.length?
+        '<h4 style="font-size:.88rem;color:var(--cp);margin-bottom:8px;border-left:3px solid var(--cp);padding-left:8px">✅ Actividades ejecutadas ('+ejec.length+')</h4>'+
+        '<div class="tw"><table class="tbl" style="margin-bottom:16px"><thead><tr><th>Actividad</th><th>Tipo</th><th>Fecha ejecución</th><th>Resultados</th></tr></thead><tbody>'+
+        ejec.map(function(a){return '<tr><td><strong>'+a.titulo+'</strong></td><td>'+a.tipo+'</td><td>'+fmtF(a.fechaE||a.fechaP)+'</td><td style="font-size:.78rem">'+(a.resultados||'—')+'</td></tr>';}).join('')+
+        '</tbody></table></div>':'')+
+
+      (showPend&&(pend.length||vencidas.length)?
+        '<h4 style="font-size:.88rem;color:#856404;margin-bottom:8px;border-left:3px solid #856404;padding-left:8px">⏳ Actividades pendientes ('+(pend.length+vencidas.length)+')</h4>'+
+        '<div class="tw"><table class="tbl" style="margin-bottom:16px"><thead><tr><th>Actividad</th><th>Tipo</th><th>Fecha planeada</th><th>Estado</th></tr></thead><tbody>'+
+        pend.concat(vencidas).map(function(a){
+          var ov=venc(a);
+          return '<tr><td>'+a.titulo+'</td><td>'+a.tipo+'</td><td>'+fmtF(a.fechaP)+'</td>'+
+            '<td><span class="badge '+(ov?'bv':'bpe')+'">'+(ov?'Vencida':'Pendiente')+'</span></td></tr>';
+        }).join('')+
+        '</tbody></table></div>':'')+
+
+      // ENTREGABLES
+      (showEnt&&ents.length?
+        '<h4 style="font-size:.88rem;color:var(--cp);margin-bottom:8px;border-left:3px solid #8a6940;padding-left:8px">🔗 Entregables ('+ents.length+')</h4>'+
+        '<div class="tw"><table class="tbl" style="margin-bottom:16px"><thead><tr><th>Entregable</th><th>Tipo</th><th>Link</th><th>Problemática solucionada</th></tr></thead><tbody>'+
+        ents.map(function(e){return '<tr><td><strong>'+e.nombre+'</strong></td><td>'+e.tipo+'</td><td>'+(e.url?'<a href="'+e.url+'" target="_blank">Ver →</a>':'—')+'</td><td style="font-size:.78rem">'+e.problema+'</td></tr>';}).join('')+
+        '</tbody></table></div>':'')+
+
+      // KPIs tabla
+      (showKpi?kpis.map(function(k){
+        var lasts=k.lecturas||[];
+        if(!lasts.length)return '';
+        return '<h4 style="font-size:.88rem;color:var(--cp);margin-bottom:8px;border-left:3px solid var(--ca);padding-left:8px">📈 KPI: '+k.nombre+(k.unidad?' ('+k.unidad+')':'')+'</h4>'+
+          '<div class="tw"><table class="tbl" style="margin-bottom:16px"><thead><tr><th>Mes</th><th>Sin RUMONT</th><th>Con RUMONT</th><th>Mejora</th><th>Observaciones</th></tr></thead><tbody>'+
+          lasts.map(function(l){return '<tr><td>'+l.mes+'</td><td>'+fmtKPI(l.anterior,k.unidad)+'</td><td><strong>'+fmtKPI(l.actual,k.unidad)+'</strong></td>'+
+            '<td style="color:'+(l.cambio>=0?'#2d6a2d':'var(--cr)')+'"><strong>'+(l.cambio>=0?'+':'')+l.cambio+'%</strong></td>'+
+            '<td style="font-size:.78rem">'+(l.obs||'—')+'</td></tr>';}).join('')+
+          '</tbody></table></div>';
+      }).join(''):'')+
+
+    '</div>';
+  }).join('');
+
+  body.innerHTML=logoHdr+globalHtml+empHtml;
+
+  // Draw charts
+  setTimeout(function(){
+    // Show logo on print
+    document.querySelectorAll('.inf-logo-hdr').forEach(function(el){el.style.display='none';});
+
+    cls.forEach(function(c,ci){
+      var kpis=D.kpis.filter(function(k){return k.cid===c.id;});
+      var kpiVentas=kpis.find(function(k){return k.categoria==='Ventas'||k.nombre.toLowerCase().includes('factur')||k.nombre.toLowerCase().includes('venta');});
+      var kpiOcup=kpis.find(function(k){return k.categoria==='Ocupación'||k.nombre.toLowerCase().includes('ocup');});
+      var dualEl=document.getElementById('dual-ch-'+c.id+'-'+ci);
+
+      if(dualEl&&kpiVentas&&kpiOcup&&kpiVentas.lecturas&&kpiOcup.lecturas){
+        // Get common months
+        var meses=kpiVentas.lecturas.map(function(l){return l.mes;});
+        var ventaData=kpiVentas.lecturas.map(function(l){return l.actual;});
+        var ventaBase=kpiVentas.lecturas.map(function(l){return l.anterior;});
+        var ocupData=kpiOcup.lecturas.map(function(l){
+          var m=kpiOcup.lecturas.find(function(x){return x.mes===l.mes;});
+          return m?m.actual:null;
+        });
+        var ch=new Chart(dualEl,{
+          type:'bar',
+          data:{
+            labels:meses,
+            datasets:[
+              {label:'Facturación Sin RUMONT (COP)',data:ventaBase,backgroundColor:'rgba(192,57,43,.5)',borderColor:'rgba(192,57,43,1)',borderWidth:2,yAxisID:'y'},
+              {label:'Facturación Con RUMONT (COP)',data:ventaData,backgroundColor:'rgba(90,105,64,.7)',borderColor:'rgba(90,105,64,1)',borderWidth:2,yAxisID:'y'},
+              {label:'Ocupación (%)',data:ocupData,type:'line',borderColor:'rgba(138,158,96,1)',backgroundColor:'rgba(138,158,96,.2)',borderWidth:3,pointRadius:5,yAxisID:'y2',tension:.4}
+            ]
+          },
+          options:{
+            responsive:true,maintainAspectRatio:false,
+            interaction:{mode:'index',intersect:false},
+            plugins:{
+              legend:{position:'bottom',labels:{font:{size:11}}},
+              tooltip:{callbacks:{
+                label:function(ctx){
+                  if(ctx.datasetIndex<=1)return ctx.dataset.label+': '+new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(ctx.parsed.y);
+                  return ctx.dataset.label+': '+ctx.parsed.y+'%';
+                }
+              }}
+            },
+            scales:{
+              y:{position:'left',title:{display:true,text:'Facturación (COP)'},ticks:{callback:function(v){return new Intl.NumberFormat('es-CO',{notation:'compact',compactDisplay:'short'}).format(v);}}},
+              y2:{position:'right',title:{display:true,text:'Ocupación (%)'},min:0,max:100,grid:{drawOnChartArea:false},ticks:{callback:function(v){return v+'%';}}}
+            }
+          }
+        });
+        _charts.push(ch);
+      } else {
+        // Fallback: activity donut
+        var acts=D.acts.filter(function(x){return x.cid===c.id;});
+        var actEl=document.getElementById('act-ch-'+c.id+'-'+ci);
+        if(actEl&&acts.length){
+          var ej=acts.filter(function(a){return a.estado==='Ejecutada';}).length;
+          var pe=acts.filter(function(a){return a.estado==='Pendiente';}).length;
+          var ca=acts.filter(function(a){return a.estado==='Cancelada';}).length;
+          var ach=new Chart(actEl,{type:'doughnut',data:{labels:['Ejecutadas','Pendientes','Canceladas'],datasets:[{data:[ej,pe,ca],backgroundColor:['rgba(45,106,45,.8)','rgba(133,100,4,.7)','rgba(153,153,153,.7)']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});
+          _charts.push(ach);
+        }
+        // KPI line chart
+        if(kpis.length&&kpis[0].lecturas&&kpis[0].lecturas.length){
+          var k0=kpis[0];var lecs=k0.lecturas;
+          var kpiEl=document.getElementById('kpi-ch-'+c.id+'-'+ci);
+          if(kpiEl){
+            var kch=new Chart(kpiEl,{type:'line',data:{labels:lecs.map(function(l){return l.mes;}),datasets:[
+              {label:'Sin RUMONT',data:lecs.map(function(l){return l.anterior;}),borderColor:'rgba(192,57,43,1)',backgroundColor:'rgba(192,57,43,.1)',tension:.4},
+              {label:'Con RUMONT',data:lecs.map(function(l){return l.actual;}),borderColor:'rgba(90,105,64,1)',backgroundColor:'rgba(90,105,64,.1)',tension:.4}
+            ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});
+            _charts.push(kch);
+          }
+        }
+      }
+    });
+  },300);
+}
+function exportInformeExcel(){
+  var cid=document.getElementById('inf-emp').value;
+  var cls=cid?D.cls.filter(function(x){return x.id===cid;}):D.cls;
+  var wb=XLSX.utils.book_new();
+  cls.forEach(function(c){
+    var rows=[['RUMONT - Informe '+c.nombre],[],
+      ['COBROS'],['Mes','Moneda','Valor','Pagado','Fecha'],
+      ...D.ccs.filter(function(x){return x.cid===c.id;}).map(function(x){return[x.mes,x.moneda||'COP',x.valor,x.pagado?'Sí':'No',fmtF(x.fecha)];}),
+      [],[' ACTIVIDADES'],['Título','Tipo','Estado','Fecha','Resultados'],
+      ...D.acts.filter(function(x){return x.cid===c.id;}).map(function(x){return[x.titulo,x.tipo,x.estado,fmtF(x.fechaP),x.resultados||''];}),
+      [],[' ENTREGABLES'],['Nombre','Tipo','URL','Problemática'],
+      ...D.ents.filter(function(x){return x.cid===c.id;}).map(function(x){return[x.nombre,x.tipo,x.url||'',x.problema];})];
+    var ws=XLSX.utils.aoa_to_sheet(rows);XLSX.utils.book_append_sheet(wb,ws,c.nombre.slice(0,31));
+  });
+  XLSX.writeFile(wb,'RUMONT-Informe.xlsx');toast('Excel descargado ✓');
+}
+
+// ── DASHBOARD ──────────────────────────────────
+function renderDash(){
+  document.getElementById('dash-fecha').textContent=new Date().toLocaleDateString('es-CO',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  var activos=D.cls.filter(function(c){return c.estado==='Activo';}).length;
+  var facturado=D.ccs.reduce(function(s,x){return s+x.valor;},0);
+  var porCobrar=D.ccs.filter(function(x){return!x.pagado;}).reduce(function(s,x){return s+x.valor;},0);
+  var gastos=D.gastos.reduce(function(s,g){return s+g.valor;},0);
+  document.getElementById('d-activos').textContent=activos;
+  document.getElementById('d-facturado').textContent=fmt(facturado);
+  document.getElementById('d-cobrar').textContent=fmt(porCobrar);
+  document.getElementById('d-utilidad').textContent=fmt(facturado-gastos);
+  document.getElementById('d-empresas').innerHTML=D.cls.filter(function(c){return c.estado==='Activo';}).slice(0,4).map(function(c){
+    var acts=D.acts.filter(function(x){return x.cid===c.id;});
+    var ej=acts.filter(function(x){return x.estado==='Ejecutada';}).length;
+    var pct=acts.length?Math.round(ej/acts.length*100):0;
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--cs);cursor:pointer" onclick="go(\'crm\')">'+
+      '<div><div style="font-weight:600;font-size:.87rem">'+c.nombre+'</div><div style="font-size:.72rem;color:var(--ct)">'+(c.sector||'')+'</div></div>'+
+      '<div style="text-align:right"><div style="font-size:.78rem">'+(c.planPagos&&c.planPagos.length?fmtNum(c.planPagos[0].valor,c.planPagos[0].moneda):fmt(c.valor||0))+'/mes</div>'+
+      '<div style="font-size:.7rem;color:var(--ca)">'+pct+'% avance</div></div></div>';
+  }).join('')||'<div style="color:var(--ct);font-size:.85rem">Sin empresas activas</div>';
+  var vencidas=D.acts.filter(venc);
+  var sinPagar=D.ccs.filter(function(x){return!x.pagado;});
+  var cumMes=D.talentos.filter(function(t){return t.nac&&parseInt(t.nac.split('-')[1])===(new Date().getMonth()+1);});
+  var alertas=[];
+  if(vencidas.length)alertas.push('<div style="padding:8px;background:#fdecea;border-radius:6px;margin-bottom:6px;font-size:.83rem">⚠️ <strong>'+vencidas.length+'</strong> actividad(es) vencida(s)</div>');
+  if(sinPagar.length)alertas.push('<div style="padding:8px;background:#fff3cd;border-radius:6px;margin-bottom:6px;font-size:.83rem">💳 <strong>'+sinPagar.length+'</strong> cobro(s) pendiente(s) · '+fmt(porCobrar)+'</div>');
+  if(cumMes.length){
+    var mArr=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    var cumStr=cumMes.map(function(t){
+      var d=t.nac?t.nac.split('-')[2]:'';
+      var m=t.nac?mArr[parseInt(t.nac.split('-')[1])-1]:'';
+      return '🎂 <strong>'+t.nom+'</strong> — '+d+' de '+m+(t.tel?' · '+t.tel:'');
+    }).join('<br>');
+    alertas.push('<div style="padding:10px;background:#e8f4e8;border-radius:6px;margin-bottom:6px;font-size:.83rem;border-left:3px solid #5a6940"><strong>🎂 Cumpleaños este mes:</strong><br>'+cumStr+'</div>');
+  }
+  document.getElementById('d-alertas').innerHTML=alertas.length?alertas.join(''):'<div style="color:var(--ct);font-size:.85rem">✅ Sin alertas activas</div>';
+  document.getElementById('d-cobros').innerHTML=D.ccs.slice(-5).reverse().map(function(cc){
+    var c=D.cls.find(function(x){return x.id===cc.cid;})||{};
+    return '<tr><td>'+(c.nombre||'—')+'</td><td>'+cc.mes+'</td><td>'+fmtNum(cc.valor,cc.moneda)+'</td><td><span class="badge '+(cc.pagado?'ba':'bpe')+'">'+(cc.pagado?'✅':'⏳')+'</span></td></tr>';
+  }).join('')||'<tr><td colspan="4" style="color:var(--ct);text-align:center">Sin cobros</td></tr>';
+  // Cumpleaños este mes con botón Google Calendar
+  var mesAct2=new Date().getMonth()+1;
+  var cumMes2=D.talentos.filter(function(t){return t.nac&&parseInt(t.nac.split('-')[1])===mesAct2;});
+  var mNom=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  var dcum=document.getElementById('d-cumples');
+  if(dcum){
+    if(!cumMes2.length){
+      dcum.innerHTML='<div style="color:var(--ct);font-size:.85rem">Sin cumpleaños este mes en la comunidad</div>';
+    } else {
+      dcum.innerHTML=cumMes2.map(function(t){
+        var dia=t.nac?t.nac.split('-')[2]:'';
+        var mesN=t.nac?mNom[parseInt(t.nac.split('-')[1])-1]:'';
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--cs)">'+
+          '<div>'+
+            '<div style="font-weight:600;font-size:.88rem">'+t.nom+'</div>'+
+            '<div style="font-size:.75rem;color:var(--ct)">'+(t.cargo||'')+(t.emp?' · '+t.emp:'')+' · 🎂 '+dia+' de '+mesN+'</div>'+
+            (t.tel?'<div style="font-size:.75rem;color:var(--ct)">📞 '+t.tel+'</div>':'')+
+          '</div>'+
+          '<button class="btn bg bsm" id="cal-'+t.id+'" onclick="abrirCalGoogle(this.id.slice(4))">📅 Calendar</button>'+
+        '</div>';
+      }).join('');
+    }
+  }
+  document.getElementById('d-gastos').innerHTML=D.gastos.slice(-4).reverse().map(function(g){
+    return '<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--cs);font-size:.82rem"><span>'+g.categoria+' - '+g.descripcion+'</span><span style="color:var(--cr)">'+fmt(g.valor)+'</span></div>';
+  }).join('')||'<div style="color:var(--ct);font-size:.85rem">Sin gastos</div>';
+}
+
+load();buildVMs();renderDash();
+</script>
+
+</body>
+</html>
