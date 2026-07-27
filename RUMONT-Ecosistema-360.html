@@ -416,6 +416,15 @@ textarea{min-height:80px;resize:vertical}
       <div id="kpi-rel-list" style="margin-bottom:6px;display:flex;flex-wrap:wrap;gap:4px"></div>
       <select id="kpi-rel-sel" style="width:auto;display:inline-block;margin:0"><option value="">+ Relacionar con otro KPI</option></select>
     </div>
+    <div class="fg" id="kpi-cruzado-sec" style="display:none;background:#f0f4e8;border-radius:8px;padding:12px;border-left:3px solid var(--cp)">
+      <label class="fl">⚡ KPI Cruzado automático</label>
+      <p style="font-size:.78rem;color:var(--ct);margin-bottom:10px">Este KPI divide automáticamente dos KPIs relacionados (ej: Facturación ÷ Ocupación)</p>
+      <div class="fr">
+        <div class="fg"><label class="fl">KPI Numerador (÷)</label><select id="kpi-cruz-num" style="margin:0"><option value="">Selecciona...</option></select></div>
+        <div class="fg"><label class="fl">KPI Denominador</label><select id="kpi-cruz-den" style="margin:0"><option value="">Selecciona...</option></select></div>
+      </div>
+      <div class="fg"><label class="fl">Nombre del resultado</label><input id="kpi-cruz-label" placeholder="Ej: Venta por punto de ocupación" style="margin:0"></div>
+    </div>
     <div class="fg"><label class="fl">Descripción / Cómo se mide</label><textarea id="kpi-desc"></textarea></div>
     <hr style="margin:12px 0;border-color:var(--cs)">
     <h4 style="font-size:.85rem;color:var(--cp);margin-bottom:10px">📅 Lecturas mensuales</h4>
@@ -496,17 +505,68 @@ textarea{min-height:80px;resize:vertical}
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
-try{
-  firebase.initializeApp({apiKey:"AIzaSyB842pjszlPzFQvtLWwWr2Kg94ZmF6CIVE",authDomain:"rumont-360.firebaseapp.com",databaseURL:"https://rumont-360-default-rtdb.firebaseio.com",projectId:"rumont-360",storageBucket:"rumont-360.firebasestorage.app",messagingSenderId:"133478036017",appId:"1:133478036017:web:9df2f6c10d286aac159b10"});
-  window.fbRef=firebase.database().ref('rumont');
-  window.fbRef.once('value').then(function(s){
-    var d=s.val();
-    if(d&&d.cls&&d.cls.length){D.cls=d.cls||[];D.ccs=d.ccs||[];D.acts=d.acts||[];D.ents=d.ents||[];D.kpis=d.kpis||[];D.gastos=d.gastos||[];D.talentos=d.talentos||[];
-    localStorage.setItem('rumont_v7',JSON.stringify(D));buildVMs();renderDash();console.log('Firebase OK');}
-  }).catch(function(e){console.warn(e);});
-  var _os=window.save;
-  window.save=function(){localStorage.setItem('rumont_v7',JSON.stringify(D));window.fbRef.set(D).catch(function(){});};
-}catch(e){console.warn('Firebase:',e);}
+(function(){
+  try{
+    firebase.initializeApp({
+      apiKey:"AIzaSyB842pjszlPzFQvtLWwWr2Kg94ZmF6CIVE",
+      authDomain:"rumont-360.firebaseapp.com",
+      databaseURL:"https://rumont-360-default-rtdb.firebaseio.com",
+      projectId:"rumont-360",
+      storageBucket:"rumont-360.firebasestorage.app",
+      messagingSenderId:"133478036017",
+      appId:"1:133478036017:web:9df2f6c10d286aac159b10"
+    });
+    var fbRef=firebase.database().ref('rumont');
+    window.fbRef=fbRef;
+
+    // ESCUCHAR CAMBIOS EN TIEMPO REAL
+    // Cada vez que cualquier dispositivo guarde, todos se actualizan
+    fbRef.on('value', function(snap){
+      var d=snap.val();
+      if(d&&d.cls&&d.cls.length>0){
+        var nuevo=JSON.stringify(d);
+        var actual=JSON.stringify(D);
+        // Solo actualizar si los datos son diferentes
+        if(nuevo!==actual){
+          D.cls=d.cls||[];
+          D.ccs=d.ccs||[];
+          D.acts=d.acts||[];
+          D.ents=d.ents||[];
+          D.kpis=d.kpis||[];
+          D.gastos=d.gastos||[];
+          D.talentos=d.talentos||[];
+          localStorage.setItem('rumont_v7',JSON.stringify(D));
+          buildVMs();
+          renderDash();
+          // Actualizar panel activo
+          var panelActivo=document.querySelector('.panel.active');
+          if(panelActivo){
+            var id=panelActivo.id.replace('panel-','');
+            var fns={crm:renderCRM,cobro:renderCobro,actividades:renderActs,
+              entregables:renderEntregables,kpis:renderKPIs,gastos:renderGastos,
+              talentos:renderTalentos};
+            if(fns[id])fns[id]();
+          }
+          console.log('✅ Datos actualizados desde Firebase en tiempo real');
+        }
+      }
+    });
+
+    // GUARDAR en Firebase + localStorage
+    window.save=function(){
+      localStorage.setItem('rumont_v7',JSON.stringify(D));
+      fbRef.set(JSON.parse(JSON.stringify(D))).then(function(){
+        console.log('✅ Guardado en Firebase');
+      }).catch(function(e){
+        console.warn('Error guardando en Firebase:',e);
+      });
+    };
+
+    console.log('🔥 Firebase tiempo real conectado - RUMONT 360');
+  }catch(e){
+    console.warn('Firebase error:',e);
+  }
+})();
 </script>
 <script>
 const SK='rumont_v7';
@@ -959,14 +1019,14 @@ function abrirKPI(id,cid){
     }
   };
   if(k&&k.categoria==='KPI Cruzado'){
-    document.getElementById('kpi-cruzado-sec').style.display='block';
+    (function(){var _e=document.getElementById('kpi-cruzado-sec');if(_e)_e.style.display='block';})();
     var opts2='<option value="">Selecciona...</option>'+D.kpis.filter(function(x){return x.id!==k.id;}).map(function(ki){return '<option value="'+ki.id+'"'+(ki.id===k.cruzNum?' selected':'')+'>'+ki.nombre+'</option>';}).join('');
     var opts3='<option value="">Selecciona...</option>'+D.kpis.filter(function(x){return x.id!==k.id;}).map(function(ki){return '<option value="'+ki.id+'"'+(ki.id===k.cruzDen?' selected':'')+'>'+ki.nombre+'</option>';}).join('');
     document.getElementById('kpi-cruz-num').innerHTML=opts2;
     document.getElementById('kpi-cruz-den').innerHTML=opts3;
     document.getElementById('kpi-cruz-label').value=k.cruzLabel||'';
   } else {
-    document.getElementById('kpi-cruzado-sec').style.display='none';
+    (function(){var _e=document.getElementById('kpi-cruzado-sec');if(_e)_e.style.display='none';})();
   }
   document.getElementById('kpi-desc').value=k?k.descripcion||'':'';
   _kLecturas=k?JSON.parse(JSON.stringify(k.lecturas||[])):[]; 
@@ -1057,97 +1117,17 @@ function guardarKPI(){
   if(idx>=0)D.kpis[idx]=obj;else D.kpis.push(obj);
   save();cerrar('m-kpi');renderKPIs();toast('KPI guardado');
 }
-function renderKPIs(){
-  var cid=document.getElementById('kpi-filt').value;
-  var cls=cid?D.cls.filter(function(c){return c.id===cid;}):D.cls;
-  var body=document.getElementById('kpis-body');
-  if(!cls.length){body.innerHTML='<div style="color:var(--ct);padding:2rem">No hay empresas</div>';return;}
-  body.innerHTML=cls.map(function(c){
-    var kpis=D.kpis.filter(function(k){return k.cid===c.id;});
-    var addBtn='<button class="btn bp bsm" id="kn-'+c.id+'" onclick="abrirKPINuevo(this.id.slice(3))">+ Nuevo KPI</button>';
-    if(!kpis.length)return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><h3>'+c.nombre+'</h3>'+addBtn+'</div></div>';
-    return '<div class="card">'+
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'+
-        '<h3>'+c.nombre+'</h3>'+addBtn+
-      '</div>'+
-      kpis.map(function(k){
-        var last=k.lecturas&&k.lecturas.length?k.lecturas[k.lecturas.length-1]:null;
-        var pct=last&&k.meta?Math.min(100,Math.round(last.actual/parseFloat(k.meta)*100)):0;
-        var rels=k.relacionados&&k.relacionados.length?k.relacionados.map(function(rid){var kr=D.kpis.find(function(x){return x.id===rid;});return kr?'<span class="kpi-tag">🔗 '+kr.nombre+'</span>':'';}).join(''):'';
-        var cruzInfo='';
-        if(k.categoria==='KPI Cruzado'&&k.cruzNum&&k.cruzDen){
-          var kN=D.kpis.find(function(x){return x.id===k.cruzNum;});
-          var kD=D.kpis.find(function(x){return x.id===k.cruzDen;});
-          cruzInfo='<div style="background:#e8f0d8;border-radius:6px;padding:8px 12px;margin-bottom:8px;font-size:.8rem">'+
-            '⚡ <strong>KPI Cruzado:</strong> '+(kN?kN.nombre:'?')+' ÷ '+(kD?kD.nombre:'?')+
-            (k.cruzLabel?' = <em>'+k.cruzLabel+'</em>':'')+
-            ' <button class="btn bs bsm" onclick="recalcularCruzado(\"'+k.id+'\")" style="margin-left:8px">🔄 Recalcular</button>'+
-          '</div>';
-        }
-        return '<div class="kpi-blk">'+
-          '<div class="kpi-blk-hdr">'+
-            '<div>'+
-              '<span style="font-size:.7rem;background:#e8f0d8;color:var(--cp);padding:2px 8px;border-radius:10px;margin-right:6px">'+k.categoria+'</span>'+
-              '<strong style="font-size:.9rem">'+k.nombre+'</strong>'+
-              (k.unidad?' <span style="font-size:.75rem;color:var(--ct)">('+k.unidad+')</span>':'')+
-            '</div>'+
-            '<div style="display:flex;gap:6px">'+
-              '<button class="btn bs bsm" id="ke-'+k.id+'" onclick="abrirKPIById(this.id.slice(3))">✏️ Editar</button>'+
-              '<button class="btn br bsm" id="kd-'+k.id+'" onclick="confirmarElimKPI(this.id.slice(3))">🗑️</button>'+
-            '</div>'+
-          '</div>'+
-          (rels?'<div style="margin-bottom:8px">'+rels+'</div>':'')+
-          cruzInfo+
-          (last?
-            '<div style="display:flex;gap:20px;margin-bottom:8px;flex-wrap:wrap">'+
-              '<div><div style="font-size:1.3rem;font-weight:700;color:var(--cp)">'+last.actual+'</div><div style="font-size:.7rem;color:var(--ct)">Con RUMONT</div></div>'+
-              '<div><div style="font-size:1.3rem;font-weight:700">'+last.anterior+'</div><div style="font-size:.7rem;color:var(--ct)">Sin RUMONT</div></div>'+
-              '<div><div style="font-size:1.3rem;font-weight:700;color:'+(last.cambio>=0?'#2d6a2d':'var(--cr)')+'">'+(last.cambio>=0?'+':'')+last.cambio+'%</div><div style="font-size:.7rem;color:var(--ct)">Variación</div></div>'+
-              (k.meta?'<div><div style="font-size:1.3rem;font-weight:700;color:var(--ca)">'+pct+'%</div><div style="font-size:.7rem;color:var(--ct)">Avance meta</div></div>':'')+
-            '</div>'+
-            '<div class="pb"><div class="pf" style="width:'+pct+'%"></div></div>'
-          :'')+
-          (k.lecturas&&k.lecturas.length?
-            '<div class="tw" style="margin-top:10px"><table class="tbl"><thead><tr><th>Mes</th><th>Sin RUMONT</th><th>Con RUMONT</th><th>Cambio</th><th>Observaciones</th></tr></thead><tbody>'+
-            k.lecturas.slice().reverse().map(function(l){
-              return '<tr><td>'+l.mes+'</td><td>'+fmtKPI(l.anterior,k.unidad)+'</td><td>'+fmtKPI(l.actual,k.unidad)+'</td>'+
-                '<td style="color:'+(l.cambio>=0?'green':'red')+'">'+(l.cambio>=0?'+':'')+l.cambio+'%</td>'+
-                '<td style="font-size:.75rem">'+(l.obs||'—')+'</td></tr>';
-            }).join('')+'</tbody></table></div>'
-          :'')+
-        '</div>';
-      }).join('')+
-    '</div>';
-  }).join('');
-}
-function recalcularCruzado(id){
-  var k=D.kpis.find(function(x){return x.id===id;});
-  if(!k||!k.cruzNum||!k.cruzDen){toast('KPI cruzado no configurado','err');return;}
-  var kNum=D.kpis.find(function(x){return x.id===k.cruzNum;});
-  var kDen=D.kpis.find(function(x){return x.id===k.cruzDen;});
-  if(!kNum||!kDen){toast('KPIs relacionados no encontrados','err');return;}
-  k.lecturas=(kNum.lecturas||[]).map(function(ln){
-    var ld=(kDen.lecturas||[]).find(function(l){return l.mes===ln.mes;});
-    if(!ld||!ld.actual||!ln.actual)return null;
-    var antR=ld.anterior?Math.round(ln.anterior/ld.anterior):0;
-    var actR=Math.round(ln.actual/ld.actual);
-    var cambio=antR?Math.round((actR-antR)/antR*100):0;
-    return{mes:ln.mes,anterior:antR,actual:actR,cambio:cambio,obs:'Auto: '+kNum.nombre+' / '+kDen.nombre};
-  }).filter(Boolean);
-  save();renderKPIs();toast('KPI cruzado recalculado ✓');
-}
 function abrirKPINuevo(cid){
   _kLecturas=[];_kRels=[];
   document.getElementById('kpi-id').value='';
   document.getElementById('m-kpi-ttl').textContent='Nuevo KPI';
   buildVMs();
-  document.getElementById('kpi-cid').value=cid||'';
+  if(cid)document.getElementById('kpi-cid').value=cid;
   document.getElementById('kpi-nom').value='';
   document.getElementById('kpi-uni').value='';
   document.getElementById('kpi-meta').value='';
   document.getElementById('kpi-cat').value='Ventas';
   document.getElementById('kpi-desc').value='';
-  document.getElementById('kpi-cruzado-sec').style.display='none';
   renderKLecturas();renderKRels();
   document.getElementById('kl-mes').value='';
   document.getElementById('kl-ant').value='';
@@ -1158,7 +1138,6 @@ function abrirKPINuevo(cid){
 function abrirKPIById(id){
   var k=D.kpis.find(function(x){return x.id===id;});
   if(!k){toast('KPI no encontrado','err');return;}
-  // Populate modal directly
   _kLecturas=JSON.parse(JSON.stringify(k.lecturas||[]));
   _kRels=JSON.parse(JSON.stringify(k.relacionados||[]));
   document.getElementById('kpi-id').value=k.id;
@@ -1176,31 +1155,96 @@ function abrirKPIById(id){
   document.getElementById('kl-act').value='';
   document.getElementById('kl-obs').value='';
   if(k.categoria==='KPI Cruzado'){
-    document.getElementById('kpi-cruzado-sec').style.display='block';
+    (function(){var _e=document.getElementById('kpi-cruzado-sec');if(_e)_e.style.display='block';})();
     var opts='<option value="">Selecciona...</option>'+D.kpis.filter(function(x){return x.id!==k.id;}).map(function(ki){return '<option value="'+ki.id+'"'+(ki.id===k.cruzNum?' selected':'')+'>'+ki.nombre+'</option>';}).join('');
     var opts2='<option value="">Selecciona...</option>'+D.kpis.filter(function(x){return x.id!==k.id;}).map(function(ki){return '<option value="'+ki.id+'"'+(ki.id===k.cruzDen?' selected':'')+'>'+ki.nombre+'</option>';}).join('');
     document.getElementById('kpi-cruz-num').innerHTML=opts;
     document.getElementById('kpi-cruz-den').innerHTML=opts2;
     document.getElementById('kpi-cruz-label').value=k.cruzLabel||'';
   } else {
-    document.getElementById('kpi-cruzado-sec').style.display='none';
+    (function(){var _e=document.getElementById('kpi-cruzado-sec');if(_e)_e.style.display='none';})();
   }
   abrir('m-kpi');
 }
-function eliminarKPIById(id){eliminarKPI(id);}
-function abrirCalGoogle(tid){
-  var t=D.talentos.find(function(x){return x.id===tid;});
-  if(!t||!t.nac){toast('Sin fecha de nacimiento registrada','err');return;}
-  var parts=t.nac.split('-');
-  var anio=new Date().getFullYear();
-  var fecha=anio+parts[1]+parts[2];
-  var titulo=encodeURIComponent('Cumpleanos de '+t.nom+' - Comunidad RUMONT');
-  var detalle=encodeURIComponent('Miembro de la Comunidad de Talentos RUMONT. Recuerda felicitarlo/a! Tel: '+(t.tel||'N/A'));
-  var url='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+titulo+'&dates='+fecha+'/'+fecha+'&details='+detalle+'&recur=RRULE:FREQ%3DYEARLY';
-  window.open(url,'_blank');
-  toast('Abriendo Google Calendar...');
+function renderKPIs(){
+  window._kpiReg={}; // registry: index -> kpi id
+  var cid=document.getElementById('kpi-filt').value;
+  var cls=cid?D.cls.filter(function(c){return c.id===cid;}):D.cls;
+  var body=document.getElementById('kpis-body');
+  if(!cls.length){body.innerHTML='<div style="color:var(--ct);padding:2rem">No hay empresas</div>';return;}
+  var html='';
+  var reg={};
+  var idx=0;
+  cls.forEach(function(c){
+    var kpis=D.kpis.filter(function(k){return k.cid===c.id;});
+    html+='<div class="card">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">';
+    html+='<h3>'+c.nombre+'</h3>';
+    window._kpiCidReg[idx]=c.id;
+    var _cidx=idx; html+='<button class="btn bp bsm" onclick="window._newKPI('+_cidx+')">+ Nuevo KPI</button>';
+    html+='</div>';
+    if(!kpis.length){html+='<div style="color:var(--ct);font-size:.85rem">Sin KPIs configurados</div>';}
+    kpis.forEach(function(k){
+      reg[idx]=k.id;
+      var last=k.lecturas&&k.lecturas.length?k.lecturas[k.lecturas.length-1]:null;
+      var pct=last&&k.meta?Math.min(100,Math.round(last.actual/parseFloat(k.meta)*100)):0;
+      var rels=k.relacionados&&k.relacionados.length?k.relacionados.map(function(rid){
+        var kr=D.kpis.find(function(x){return x.id===rid;});
+        return kr?'<span class="kpi-tag">🔗 '+kr.nombre+'</span>':'';
+      }).join(''):'';
+      var cruzInfo='';
+      if(k.categoria==='KPI Cruzado'&&k.cruzNum&&k.cruzDen){
+        var kN=D.kpis.find(function(x){return x.id===k.cruzNum;});
+        var kD=D.kpis.find(function(x){return x.id===k.cruzDen;});
+        cruzInfo='<div style="background:#e8f0d8;border-radius:6px;padding:8px 12px;margin-bottom:8px;font-size:.8rem">'+
+          '⚡ <strong>KPI Cruzado:</strong> '+(kN?kN.nombre:'?')+' ÷ '+(kD?kD.nombre:'?')+
+          (k.cruzLabel?' = <em>'+k.cruzLabel+'</em>':'')+
+          ' <button class="btn bs bsm" onclick="recalcularCruzado(this.dataset.kid)" data-kid="'+k.id+'" style="margin-left:8px">🔄 Recalcular</button>'+
+        '</div>';
+      }
+      html+='<div class="kpi-blk">';
+      html+='<div class="kpi-blk-hdr">';
+      html+='<div>';
+      html+='<span style="font-size:.7rem;background:#e8f0d8;color:var(--cp);padding:2px 8px;border-radius:10px;margin-right:6px">'+k.categoria+'</span>';
+      html+='<strong style="font-size:.9rem">'+k.nombre+'</strong>';
+      html+=(k.unidad?' <span style="font-size:.75rem;color:var(--ct)">('+k.unidad+')</span>':'');
+      html+='</div>';
+      html+='<div style="display:flex;gap:6px">';
+      html+='<button class="btn bs bsm" onclick="window._editKPI('+idx+')">✏️ Editar</button>';
+      html+='<button class="btn br bsm" onclick="window._delKPI('+idx+')">🗑️</button>';
+      html+='</div>';
+      html+='</div>';
+      if(rels)html+='<div style="margin-bottom:8px">'+rels+'</div>';
+      html+=cruzInfo;
+      if(last){
+        html+='<div style="display:flex;gap:20px;margin-bottom:8px;flex-wrap:wrap">';
+        html+='<div><div style="font-size:1.3rem;font-weight:700;color:var(--cp)">'+fmtKPI(last.actual,k.unidad)+'</div><div style="font-size:.7rem;color:var(--ct)">Con RUMONT</div></div>';
+        html+='<div><div style="font-size:1.3rem;font-weight:700">'+fmtKPI(last.anterior,k.unidad)+'</div><div style="font-size:.7rem;color:var(--ct)">Sin RUMONT</div></div>';
+        html+='<div><div style="font-size:1.3rem;font-weight:700;color:'+(last.cambio>=0?'#2d6a2d':'var(--cr)')+'">'+( last.cambio>=0?'+':'')+last.cambio+'%</div><div style="font-size:.7rem;color:var(--ct)">Variación</div></div>';
+        if(k.meta)html+='<div><div style="font-size:1.3rem;font-weight:700;color:var(--ca)">'+pct+'%</div><div style="font-size:.7rem;color:var(--ct)">Avance meta</div></div>';
+        html+='</div>';
+        html+='<div class="pb"><div class="pf" style="width:'+pct+'%"></div></div>';
+      }
+      if(k.lecturas&&k.lecturas.length){
+        html+='<div class="tw" style="margin-top:10px"><table class="tbl"><thead><tr><th>Mes</th><th>Sin RUMONT</th><th>Con RUMONT</th><th>Cambio</th><th>Observaciones</th></tr></thead><tbody>';
+        k.lecturas.slice().reverse().forEach(function(l){
+          html+='<tr><td>'+l.mes+'</td><td>'+fmtKPI(l.anterior,k.unidad)+'</td><td>'+fmtKPI(l.actual,k.unidad)+'</td>';
+          html+='<td style="color:'+(l.cambio>=0?'green':'red')+'">'+(l.cambio>=0?'+':'')+l.cambio+'%</td>';
+          html+='<td style="font-size:.75rem">'+(l.obs||'—')+'</td></tr>';
+        });
+        html+='</tbody></table></div>';
+      }
+      html+='</div>';
+      idx++;
+    });
+    html+='</div>';
+  });
+  body.innerHTML=html;
+  window._kpiReg=reg;
+  // Attach click handlers using registry
+  // Update global registry
+  window._kpiReg=reg;
 }
-function confirmarElimKPI(id){if(confirm('¿Eliminar este KPI?'))eliminarKPI(id);}
 function eliminarKPI(id){if(!confirm('¿Eliminar KPI?'))return;D.kpis=D.kpis.filter(function(x){return x.id!==id;});save();renderKPIs();toast('KPI eliminado');}
 
 // ── GASTOS ─────────────────────────────────────
@@ -1630,6 +1674,23 @@ function renderDash(){
   }).join('')||'<div style="color:var(--ct);font-size:.85rem">Sin gastos</div>';
 }
 
+// Global KPI handlers - defined once at startup
+window._kpiReg={};
+window._kpiCidReg={};
+window._editKPI=function(i){
+  var kid=window._kpiReg[i];
+  if(!kid){toast('Error: KPI no encontrado','err');return;}
+  abrirKPIById(kid);
+};
+window._delKPI=function(i){
+  var kid=window._kpiReg[i];
+  if(!kid)return;
+  if(confirm('¿Eliminar este KPI?'))eliminarKPI(kid);
+};
+window._newKPI=function(i){
+  var cid=window._kpiCidReg[i];
+  abrirKPINuevo(cid||'');
+};
 load();buildVMs();renderDash();
 </script>
 
