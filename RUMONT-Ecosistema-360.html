@@ -158,10 +158,12 @@ textarea{min-height:80px;resize:vertical}
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <select class="vm" id="co-emp" style="width:200px;margin:0" onchange="renderCobro()"><option value="">Todas</option></select>
       <select style="width:120px;margin:0" onchange="renderCobro()" id="co-est"><option value="">Todos</option><option value="0">Pendientes</option><option value="1">Pagados</option></select>
+      <select style="width:140px;margin:0" onchange="renderCobro()" id="co-tipo-filt"><option value="">Todos los tipos</option><option value="Mentoria">Mentoría</option><option value="Producto">Producto</option><option value="Otro">Otro</option></select>
       <button class="btn bp bsm" onclick="abrirCobro()">+ Nueva cuenta</button>
+      <button class="btn bg bsm" onclick="exportContadora()">📊 Excel contadora</button>
     </div>
   </div>
-  <div class="tw"><table class="tbl"><thead><tr><th>Empresa</th><th>Mes</th><th>Moneda</th><th>Valor</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody id="co-tbody"></tbody></table></div>
+  <div class="tw"><table class="tbl"><thead><tr><th>Empresa</th><th>Mes</th><th>Tipo</th><th>Concepto</th><th>Moneda</th><th>Valor</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody id="co-tbody"></tbody></table></div>
 </div>
 
 <!-- ACTIVIDADES -->
@@ -323,7 +325,10 @@ textarea{min-height:80px;resize:vertical}
       <div class="fg"><label class="fl">Número</label><input id="co-num" placeholder="CC-2026-001"></div>
       <div class="fg"><label class="fl">Fecha</label><input type="date" id="co-fecha"></div>
     </div>
-    <div class="fg"><label class="fl">Descripción</label><input id="co-desc" placeholder="Servicio de mentoría comercial"></div>
+    <div class="fg"><label class="fl">Tipo de cobro</label>
+      <select id="co-tipo"><option value="Mentoria">Mentoría comercial</option><option value="Producto">Venta producto hospitalidad</option><option value="Otro">Otro servicio</option></select>
+    </div>
+    <div class="fg"><label class="fl">Concepto / Descripción</label><input id="co-desc" placeholder="Servicio de mentoría comercial - Mes de..."></div>
     <div class="fr3">
       <div class="fg"><label class="fl">Moneda</label>
         <select id="co-moneda" onchange="calcCobro()"><option value="COP">COP</option><option value="USD">USD</option><option value="EUR">EUR</option></select>
@@ -755,6 +760,7 @@ function abrirCobro(cid,id){
   document.getElementById('co-num').value=cc?cc.num||'':'';
   document.getElementById('co-fecha').value=cc?cc.fecha:new Date().toISOString().slice(0,10);
   document.getElementById('co-desc').value=cc?cc.desc||'':'Servicio de mentoría comercial';
+  if(document.getElementById('co-tipo'))document.getElementById('co-tipo').value=cc?cc.tipo_cobro||'Mentoria':'Mentoria';
   document.getElementById('co-moneda').value=cc?cc.moneda||'COP':'COP';
   document.getElementById('co-val').value=cc?cc.valor||'':'';
   document.getElementById('co-iva').value=cc?cc.ivap||0:0;
@@ -780,7 +786,8 @@ function guardarCobro(){
   var id=document.getElementById('co-id').value||uid();
   var ivap=parseFloat(document.getElementById('co-iva').value)||0;
   var mon=document.getElementById('co-moneda').value||'COP';
-  var obj={id:id,cid:cid,mes:mes,num:document.getElementById('co-num').value,fecha:document.getElementById('co-fecha').value,
+  var tco=document.getElementById('co-tipo')?document.getElementById('co-tipo').value:'Mentoria';
+  var obj={id:id,cid:cid,mes:mes,tipo_cobro:tco,num:document.getElementById('co-num').value,fecha:document.getElementById('co-fecha').value,
     desc:document.getElementById('co-desc').value,valor:val,moneda:mon,ivap:ivap,iva:val*(ivap/100),total:val*(1+ivap/100),
     notas:document.getElementById('co-notas').value,pagado:document.getElementById('co-pagado').value==='1',creado:new Date().toISOString()};
   var idx=D.ccs.findIndex(function(x){return x.id===id;});
@@ -832,6 +839,27 @@ function imprimirCobro(){
   w.document.close();w.print();
 }
 function eliminarCobro(id){if(!confirm('¿Eliminar?'))return;D.ccs=D.ccs.filter(function(x){return x.id!==id;});save();renderCobro();toast('Eliminada');}
+function exportContadora(){
+  var wb=XLSX.utils.book_new();
+  var getCobros=function(tipo){
+    return D.ccs.filter(function(x){return!tipo||(x.tipo_cobro||'Mentoria')===tipo;}).map(function(cc){
+      var c=D.cls.find(function(x){return x.id===cc.cid;})||{};
+      return{'Empresa':c.nombre||'—','Tipo':cc.tipo_cobro||'Mentoría','Mes':cc.mes,'Concepto':cc.desc||'','Moneda':cc.moneda||'COP','Valor Neto':cc.valor,'IVA %':cc.ivap||0,'IVA $':cc.iva||0,'Total':cc.total,'Pagado':cc.pagado?'Sí':'No','Fecha':fmtF(cc.fecha)};
+    });
+  };
+  var men=getCobros('Mentoria');
+  var pro=getCobros('Producto');
+  var ot=getCobros('Otro');
+  var all=getCobros('');
+  if(all.length){XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(all),'Todos los cobros');}
+  if(men.length){XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(men),'Mentorías');}
+  if(pro.length){XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(pro),'Ventas Productos');}
+  if(ot.length){XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(ot),'Otros');}
+  var gastos=D.gastos.map(function(g){return{'Categoría':g.categoria,'Descripción':g.descripcion,'Periodicidad':g.tipo,'Mes':g.mes,'Valor':g.valor,'Fecha':fmtF(g.fecha),'Notas':g.notas||''};});
+  if(gastos.length){XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(gastos),'Gastos RUMONT');}
+  XLSX.writeFile(wb,'RUMONT-Contabilidad-'+new Date().toISOString().slice(0,10)+'.xlsx');
+  toast('Excel para contadora descargado ✓');
+}
 function exportCobroExcel(cid){
   var nombre=(D.cls.find(function(x){return x.id===cid;})||{}).nombre||'empresa';
   var data=D.ccs.filter(function(x){return x.cid===cid;}).map(function(cc){return{'Mes':cc.mes,'Número':cc.num||'','Descripción':cc.desc||'','Moneda':cc.moneda||'COP','Valor Neto':cc.valor,'IVA':cc.iva||0,'Total':cc.total,'Pagado':cc.pagado?'Sí':'No','Fecha':fmtF(cc.fecha)};});
@@ -842,7 +870,8 @@ function exportCobroExcel(cid){
 function renderCobro(){
   var cid=document.getElementById('co-emp').value;
   var est=document.getElementById('co-est').value;
-  var list=D.ccs.filter(function(x){return(!cid||x.cid===cid)&&(est===''||x.pagado===(est==='1'));});
+  var tipoF=document.getElementById('co-tipo-filt')?document.getElementById('co-tipo-filt').value:'';
+  var list=D.ccs.filter(function(x){return(!cid||x.cid===cid)&&(est===''||x.pagado===(est==='1'))&&(!tipoF||x.tipo_cobro===tipoF);});
   var tb=document.getElementById('co-tbody');
   if(!list.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--ct)">No hay cuentas</td></tr>';return;}
   tb.innerHTML=list.map(function(cc){
@@ -850,6 +879,8 @@ function renderCobro(){
     return '<tr>'+
       '<td><strong>'+(c.nombre||'—')+'</strong></td>'+
       '<td>'+cc.mes+'</td>'+
+      '<td><span class="badge '+(cc.tipo_cobro==='Producto'?'bpe':'ba')+'" style="font-size:.7rem">'+(cc.tipo_cobro||'Mentoría')+'</span></td>'+
+      '<td style="font-size:.78rem;max-width:150px">'+(cc.desc||'—')+'</td>'+
       '<td><span class="badge bgr">'+(cc.moneda||'COP')+'</span></td>'+
       '<td>'+fmtNum(cc.total,cc.moneda)+'</td>'+
       '<td><span class="badge '+(cc.pagado?'ba':'bpe')+'">'+(cc.pagado?'✅ Pagado':'⏳ Pendiente')+'</span></td>'+
