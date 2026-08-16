@@ -942,7 +942,12 @@ function guardarCobro(){
     notas:document.getElementById('co-notas').value,pagado:document.getElementById('co-pagado').value==='1',creado:new Date().toISOString()};
   var idx=D.ccs.findIndex(function(x){return x.id===id;});
   if(idx>=0)D.ccs[idx]=obj;else D.ccs.push(obj);
-  save();cerrar('m-cobro');renderCobro();toast('Cuenta guardada');
+  if(window._compraPend){
+    var cp=D.compras.find(function(x){return x.id===window._compraPend;});
+    if(cp)cp.cobro_id=id;
+    window._compraPend=null;
+  }
+  save();cerrar('m-cobro');renderCobro();if(typeof renderCompras==='function')renderCompras();toast('Cuenta guardada');
 }
 function togPago(id){
   var cc=D.ccs.find(function(x){return x.id===id;});
@@ -1537,6 +1542,41 @@ function renderGastos(){
 function eliminarGasto(id){if(!confirm('¿Eliminar?'))return;D.gastos=D.gastos.filter(function(x){return x.id!==id;});save();renderGastos();toast('Eliminado');}
 
 
+
+// ── HELPERS DE MES ──────────────────────────────
+var MESES_ES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+function mesKey(m){
+  if(!m)return 0;
+  var t=(''+m).toLowerCase().trim();
+  var ym=t.match(/\d{4}/);
+  if(!ym)return 0;
+  var idx=-1;
+  MESES_ES.forEach(function(n,i){if(t.indexOf(n.slice(0,3))>=0&&idx<0)idx=i;});
+  if(idx<0)return 0;
+  return parseInt(ym[0],10)*100+(idx+1);
+}
+function mismoMes(a,b){
+  if(!a||!b)return false;
+  if((''+a).toLowerCase().trim()===(''+b).toLowerCase().trim())return true;
+  var ka=mesKey(a),kb=mesKey(b);
+  return !!(ka&&kb&&ka===kb);
+}
+function mesActualStr(){
+  var d=new Date();
+  return MESES_ES[d.getMonth()].charAt(0).toUpperCase()+MESES_ES[d.getMonth()].slice(1)+' '+d.getFullYear();
+}
+// Devuelve el valor que esa empresa aporta EN ESE MES según su plan de pagos
+function valorPlanMes(c,mes){
+  if(c.planPagos&&c.planPagos.length){
+    var p=null;
+    c.planPagos.forEach(function(x){if(!p&&mismoMes(x.mes,mes))p=x;});
+    if(p)return {valor:p.valor||0,moneda:p.moneda||'COP',enPlan:true};
+    if(!mesKey(mes))return {valor:c.planPagos[0].valor||0,moneda:c.planPagos[0].moneda||'COP',enPlan:true};
+    return {valor:0,moneda:c.planPagos[0].moneda||'COP',enPlan:false};
+  }
+  return {valor:c.valor||0,moneda:'COP',enPlan:true};
+}
+
 // ── PRODUCTOS HOSPITALIDAD ──────────────────────
 function cmpCanalChg(){
   var c=document.getElementById('cmp-canal').value;
@@ -1709,7 +1749,8 @@ function renderCompras(){
         '<div><h3 style="margin:0">'+(c.proveedor||c.canal)+'</h3>'+
           '<div style="font-size:.78rem;color:var(--ct);margin-top:3px">'+c.canal+' · '+(c.medio_pago||'')+(c.tarjeta?' ('+c.tarjeta+')':'')+' · '+fmtF(c.fecha)+(cli?' · Para: '+cli:'')+'</div></div>'+
         '<div style="text-align:right">'+
-          '<span class="badge '+(pag?'ba':'bv')+'">'+(pag?'Desembolsado':'Por desembolsar')+'</span><br>'+
+          '<span class="badge '+(pag?'ba':'bv')+'">'+(pag?'Desembolsado':'Por desembolsar')+'</span>'+
+          (c.cobro_id?' <span class="badge ba">🧾 Cobro generado</span>':'')+'<br>'+
           '<span style="font-size:.75rem;color:var(--ct)">'+destinoPago(c)+'</span></div>'+
       '</div>'+
       '<table class="tbl"><thead><tr><th>Producto</th><th>Cant</th><th>Costo c/u</th><th>Venta c/u</th><th>Ganancia</th><th>Margen</th></tr></thead><tbody>'+
@@ -1730,10 +1771,36 @@ function renderCompras(){
       (c.notas?'<div style="font-size:.8rem;color:var(--ct);margin-top:8px">📝 '+c.notas+'</div>':'')+
       '<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">'+
         '<button class="btn bs bsm" onclick="abrirCompra(\''+c.id+'\')">✏️ Editar</button>'+
+        (c.cobro_id?'<button class="btn bg bsm" onclick="verCobroDeCompra(\''+c.id+'\')">🧾 Ver cuenta de cobro</button>':'<button class="btn bp bsm" onclick="cobroDesdeCompra(\''+c.id+'\')">🧾 Generar cuenta de cobro</button>')+
         '<button class="btn '+(pag?'bg':'bp')+' bsm" onclick="marcarPagada(\''+c.id+'\')">'+(pag?'↩️ Marcar pendiente':'✓ Ya desembolsé')+'</button>'+
         '<button class="btn br bsm" onclick="eliminarCompra(\''+c.id+'\')">🗑️</button>'+
       '</div></div>';
   }).join('');
+}
+
+function cobroDesdeCompra(id){
+  var c=D.compras.find(function(x){return x.id===id;});
+  if(!c)return;
+  if(!c.cliente_id){toast('Primero asigna el cliente destino en la compra','err');abrirCompra(id);return;}
+  var t=totalesCompra(c.items);
+  if(!t.venta){toast('Esta compra no tiene precios de venta','err');return;}
+  window._compraPend=id;
+  abrirCobro(c.cliente_id);
+  document.getElementById('co-tipo').value='Producto';
+  document.getElementById('co-mes').value=mesActualStr();
+  document.getElementById('co-val').value=t.venta;
+  document.getElementById('co-desc').value='Productos de hospitalidad: '+(c.items||[]).map(function(i){
+    return i.desc+(i.cant>1?' (x'+i.cant+')':'');
+  }).join(', ');
+  document.getElementById('co-fecha').value=new Date().toISOString().slice(0,10);
+  calcCobro();
+  toast('Revisa y guarda la cuenta de cobro');
+}
+function verCobroDeCompra(id){
+  var c=D.compras.find(function(x){return x.id===id;});
+  if(!c||!c.cobro_id)return;
+  go('cobro');
+  setTimeout(function(){abrirCobro(null,c.cobro_id);},150);
 }
 function exportComprasExcel(){
   var data=[];
@@ -2181,33 +2248,31 @@ function renderMeta(){
   // Populate mes selector
   var meses=[];
   D.ccs.forEach(function(cc){if(cc.mes&&!meses.includes(cc.mes))meses.push(cc.mes);});
-  meses.sort().reverse();
+  D.cls.forEach(function(c){(c.planPagos||[]).forEach(function(pp){if(pp.mes&&!meses.includes(pp.mes))meses.push(pp.mes);});});
+  var MACT=mesActualStr();
+  if(!meses.some(function(m){return mismoMes(m,MACT);}))meses.push(MACT);
+  meses.sort(function(a,b){return mesKey(b)-mesKey(a);});
   var sel=document.getElementById('meta-mes');
   if(sel){
     var cur=sel.value;
-    sel.innerHTML='<option value="">Mes actual</option>'+meses.map(function(m){return '<option'+(m===cur?' selected':'')+'>'+m+'</option>';}).join('');
+    sel.innerHTML='<option value="">Mes actual ('+MACT+')</option>'+meses.map(function(m){return '<option'+(m===cur?' selected':'')+'>'+m+'</option>';}).join('');
   }
-  var mesSelec=sel&&sel.value?sel.value:meses[0]||'';
+  var mesSelec=sel&&sel.value?sel.value:MACT;
 
   // Calcular ingresos mentoría del mes seleccionado
   var cobrosM=D.ccs.filter(function(cc){
-    var esMes=!mesSelec||cc.mes===mesSelec;
+    var esMes=!mesSelec||mismoMes(cc.mes,mesSelec);
     var esMentoria=!cc.tipo_cobro||cc.tipo_cobro==='Mentoria'||cc.tipo_cobro==='Mentoría';
     return esMes&&esMentoria;
   });
   var cobrosP=D.ccs.filter(function(cc){
-    var esMes=!mesSelec||cc.mes===mesSelec;
+    var esMes=!mesSelec||mismoMes(cc.mes,mesSelec);
     return esMes&&cc.tipo_cobro==='Producto';
   });
 
   // También sumar valor mensual de empresas activas (plan de pagos)
   var ingresosActivos=D.cls.filter(function(c){return c.estado==='Activo';}).reduce(function(s,c){
-    if(c.planPagos&&c.planPagos.length){
-      // Find matching month payment
-      var plan=c.planPagos.find(function(p){return mesSelec&&p.mes&&p.mes.toLowerCase().includes(mesSelec.toLowerCase().split(' ')[0].toLowerCase());});
-      return s+(plan?plan.valor:c.planPagos[0].valor||0);
-    }
-    return s+(c.valor||0);
+    return s+valorPlanMes(c,mesSelec).valor;
   },0);
 
   var totalMentoria=cobrosM.length>0?cobrosM.reduce(function(s,cc){return s+cc.valor;},0):ingresosActivos;
@@ -2240,14 +2305,15 @@ function renderMeta(){
 
   // Empresas activas
   var empHtml=D.cls.filter(function(c){return c.estado==='Activo';}).map(function(c){
-    var val=c.planPagos&&c.planPagos.length?c.planPagos[0].valor:c.valor||0;
-    var mon=c.planPagos&&c.planPagos.length?c.planPagos[0].moneda||'COP':'COP';
+    var vp=valorPlanMes(c,mesSelec);
+    var val=vp.valor,mon=vp.moneda;
     var porcentaje=Math.round(val/META*100);
+    var det=vp.enPlan?(porcentaje+'% de la meta'):'Sin pago este mes';
     return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--cs)">'+
       '<div><div style="font-weight:600;font-size:.88rem">'+c.nombre+'</div>'+
       '<div style="font-size:.75rem;color:var(--ct)">'+c.sector+'</div></div>'+
-      '<div style="text-align:right"><div style="font-weight:700;color:var(--cp)">'+fmtNum(val,mon)+'</div>'+
-      '<div style="font-size:.72rem;color:var(--ct)">'+porcentaje+'% de la meta</div></div>'+
+      '<div style="text-align:right"><div style="font-weight:700;color:'+(val>0?'var(--cp)':'var(--ct)')+'">'+fmtNum(val,mon)+'</div>'+
+      '<div style="font-size:.72rem;color:var(--ct)">'+det+'</div></div>'+
     '</div>';
   }).join('');
   document.getElementById('meta-empresas').innerHTML=empHtml||'<div style="color:var(--ct)">Sin empresas activas</div>';
