@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laura Ruiz · RUMONT</title>
+<meta name="description" content="Laura Ruiz, fundadora de RUMONT. Mentorías comerciales para hospitalidad.">
+<meta name="theme-color" content="#5e6447">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --crema:#f6f2de; --arena:#9c9678; --oliva:#5e6447; --negro:#000;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--crema); color:var(--negro);
+    font-family:'Montserrat',system-ui,sans-serif;
+    min-height:100vh; display:flex; justify-content:center;
+    padding:32px 18px 40px;
+  }
+  .card{width:100%;max-width:420px;text-align:center}
+  .logo{display:block;max-width:190px;max-height:110px;margin:0 auto 6px;object-fit:contain}
+  .wordmark{
+    font-family:'Cormorant Garamond',serif;font-weight:600;
+    font-size:44px;letter-spacing:.32em;padding-left:.32em;color:var(--oliva);
+  }
+  .tag{font-size:10.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--arena);margin-top:6px}
+  .line{width:48px;height:1px;background:var(--arena);margin:22px auto}
+  h1{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:30px;line-height:1.1}
+  .role{font-size:12.5px;color:var(--oliva);margin-top:6px;letter-spacing:.04em}
+  .msg{
+    font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18.5px;line-height:1.5;
+    color:#2b2b22;margin:22px 4px 26px;
+  }
+  .msg strong{font-style:normal;font-weight:600;color:var(--oliva)}
+  .btns{display:flex;flex-direction:column;gap:11px}
+  .btn{
+    display:flex;align-items:center;gap:14px;text-decoration:none;
+    padding:15px 18px;border-radius:14px;font-size:14.5px;font-weight:500;
+    border:1px solid var(--arena);color:var(--negro);background:rgba(255,255,255,.45);
+    transition:transform .15s, background .15s;
+  }
+  .btn:active{transform:scale(.98)}
+  .btn svg{width:22px;height:22px;flex:none}
+  .btn span{flex:1;text-align:left}
+  .btn small{display:block;font-size:11.5px;font-weight:400;color:#6b6852;margin-top:2px}
+  .btn.main{background:var(--oliva);border-color:var(--oliva);color:var(--crema)}
+  .btn.main small{color:#d9d4b8}
+  .btn.save{background:var(--negro);border-color:var(--negro);color:var(--crema)}
+  .btn.save small{color:var(--arena)}
+  footer{margin-top:30px;font-size:11px;color:var(--arena);letter-spacing:.06em}
+</style>
+</head>
+<body>
+<main class="card">
+  <img class="logo" src="logo-rumont.png" alt="RUMONT"
+       onerror="this.style.display='none';document.getElementById('wm').style.display='block'">
+  <div id="wm" class="wordmark" style="display:none">RUMONT</div>
+  <div class="tag">Mentorías comerciales · Hospitalidad</div>
+
+  <div class="line"></div>
+
+  <h1>Laura Ruiz</h1>
+  <div class="role">Fundadora &amp; CEO de RUMONT</div>
+
+  <p class="msg">
+    Hola, soy Laura Ruiz, fundadora de RUMONT. Bienvenido a nuestro punto de encuentro.
+    Escoge el canal donde prefieras conversar: por <strong>WhatsApp</strong> te respondo personalmente,
+    en la <strong>web</strong> encuentras el diagnóstico de tu negocio, y en <strong>Instagram</strong> y
+    <strong>LinkedIn</strong> compartimos cada semana cómo convertir hospitalidad en facturación.
+    Nos vemos del otro lado.
+  </p>
+
+  <div class="btns">
+    <a class="btn main" href="https://wa.me/573108008313?text=Hola%20Laura%2C%20escane%C3%A9%20tu%20QR%20y%20me%20gustar%C3%ADa%20conversar%20sobre%20RUMONT." target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.3-.4.8-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.2.7.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>
+      <span>WhatsApp<small>Te respondo personalmente</small></span>
+    </a>
+
+    <a class="btn" href="https://www.rumont.co" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+      <span>rumont.co<small>Diagnóstico de tu negocio</small></span>
+    </a>
+
+    <a class="btn" href="https://www.instagram.com/rumont_mentorias" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r=".9" fill="currentColor"/></svg>
+      <span>Instagram<small>@rumont_mentorias</small></span>
+    </a>
+
+    <a class="btn" href="https://www.linkedin.com/in/lauraruiz-profesionalenmarketing" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9.5h4V21H3zM9.5 9.5h3.8v1.6h.1c.5-1 1.8-2 3.7-2 4 0 4.7 2.6 4.7 6V21h-4v-5.2c0-1.2 0-2.8-1.7-2.8s-2 1.3-2 2.7V21h-4z"/></svg>
+      <span>LinkedIn<small>Laura Ruiz</small></span>
+    </a>
+
+    <a class="btn" href="mailto:Laura.ruiz@rumont.co">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+      <span>Correo<small>Laura.ruiz@rumont.co</small></span>
+    </a>
+
+    <a class="btn save" href="#" id="save">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5M19 3v6M16 6h6"/></svg>
+      <span>Guardar contacto<small>Agrégame a tu agenda</small></span>
+    </a>
+  </div>
+
+  <footer>RUMONT® · Medellín, Colombia</footer>
+</main>
+
+<script>
+document.getElementById('save').addEventListener('click', function(e){
+  e.preventDefault();
+  var v = [
+    'BEGIN:VCARD','VERSION:3.0',
+    'N:Ruiz;Laura;;;','FN:Laura Ruiz',
+    'ORG:RUMONT','TITLE:Fundadora & CEO',
+    'TEL;TYPE=CELL,VOICE:+573108008313',
+    'EMAIL;TYPE=WORK:Laura.ruiz@rumont.co',
+    'URL:https://www.rumont.co',
+    'X-SOCIALPROFILE;TYPE=instagram:https://www.instagram.com/rumont_mentorias',
+    'X-SOCIALPROFILE;TYPE=linkedin:https://www.linkedin.com/in/lauraruiz-profesionalenmarketing',
+    'NOTE:Mentorías comerciales para hospitalidad - Método RUMONT',
+    'END:VCARD'
+  ].join('\r\n');
+  var blob = new Blob([v], {type:'text/vcard;charset=utf-8'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Laura-Ruiz-RUMONT.vcf';
+  document.body.appendChild(a); a.click(); a.remove();
+});
+</script>
+</body>
+</html>
