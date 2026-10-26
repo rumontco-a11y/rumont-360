@@ -154,9 +154,9 @@
   var ask=document.getElementById('ask'), hello=document.getElementById('hello');
   var aud=document.getElementById('aud'), voice=document.getElementById('voice');
   var ic=document.getElementById('ic'), lbl=document.getElementById('lbl');
-  var hasAudio=false;
-  aud.addEventListener('canplaythrough',function(){hasAudio=true;voice.style.display='flex';},{once:true});
-  aud.addEventListener('loadedmetadata',function(){hasAudio=true;voice.style.display='flex';},{once:true});
+  // El reproductor se muestra siempre; solo se oculta si el audio no existe
+  voice.style.display='flex';
+  aud.addEventListener('error',function(){voice.style.display='none';});
 
   function wa(text){return 'https://wa.me/'+PHONE+'?text='+encodeURIComponent(text);}
   function clean(s){s=(s||'').trim().replace(/\s+/g,' ');return s?s.split(' ').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1).toLowerCase();}).join(' '):'';}
